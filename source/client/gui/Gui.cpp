@@ -669,6 +669,19 @@ void Gui::renderToolBar(float f, float alpha)
 	// selection mark
 	blit(-1 - hotbarWidth / 2 + 20 * inventory->m_selectedSlot, -23, 0, 22, 24, 22, 0, 0);
 
+	// chat and pause button for mobile devices
+	if (mc->isTouchscreen())
+	{
+		textures->loadAndBindTexture("gui/gui2.png");
+		
+		currentShaderColor.a = 0.5f;
+
+		blit(-19, -GuiHeight + 1, 200, 82, 18, 18, 0, 0); // chat
+		blit(0, -GuiHeight + 1, 200, 64, 18, 18, 0, 0); // pause
+
+		currentShaderColor.a = alpha;
+	}
+
 	textures->loadAndBindTexture(C_BLOCKS_NAME);
 
 	int diff = mc->useTouchscreen();
