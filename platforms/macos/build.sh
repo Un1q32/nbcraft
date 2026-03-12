@@ -334,7 +334,7 @@ for target in $targets; do
                 target_cflags="$cflags -march=pentium-m"
                 set -- -DCMAKE_EXE_LINKER_FLAGS='-framework IOKit -framework Carbon -framework AudioUnit -undefined dynamic_lookup'
             else
-                target_cflags=
+                target_cflags="-mno-altivec"
                 cc="$target-gcc"
                 cxx="$target-g++"
                 target_ar="cctools-ar"
