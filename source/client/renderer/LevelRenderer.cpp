@@ -1118,7 +1118,11 @@ void LevelRenderer::setTilesDirty(const TilePos& min, const TilePos& max)
 
 void LevelRenderer::tick()
 {
-	const Entity& camera = *m_pMinecraft->m_pCameraEntity;
+	const Entity* pCamera = m_pMinecraft->m_pCameraEntity;
+	if (!pCamera)
+		return;
+
+	const Entity& camera = *pCamera;
 	const Level& level = *m_pMinecraft->m_pLevel;
 	const Options& options = *m_pMinecraft->getOptions();
 

@@ -144,6 +144,6 @@ void MultiplayerLocalPlayer::refreshContainer(ContainerMenu* menu, const std::ve
 void MultiplayerLocalPlayer::slotChanged(ContainerMenu* menu, int index, Slot* slot, ItemStack& item, bool isResultSlot)
 {
 #if NETWORK_PROTOCOL_VERSION >= 5
-    m_pMinecraft->m_pRakNetInstance->send(new ContainerSetSlotPacket(m_pContainerMenu->m_containerId, index, item));
+    m_pMinecraft->m_pRakNetInstance->send(new ContainerSetSlotPacket(menu->m_containerId, index, item));
 #endif
 }

@@ -109,7 +109,7 @@ void ContainerMenu::containerContentChanged(Container* container, SlotID contain
     for (size_t i = 0; i < m_slots.size(); ++i)
     {
         Slot* slot = m_slots[i];
-        if (slot->m_pContainer == container && slot->m_slot == containerSlot)
+        if (slot->m_pContainer == container && slot->m_index == containerSlot)
         {
             if (m_bBroadcastChanges)
                 broadcastChanges(i);
