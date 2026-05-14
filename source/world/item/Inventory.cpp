@@ -300,7 +300,7 @@ bool Inventory::removeResource(int id)
 // Doesn't exist in PE
 void Inventory::tick()
 {
-    for (size_t i = 0; i < m_items.size(); i++)
+    for (SlotID i = 0; i < m_items.size(); i++)
     {
 		ItemStack& item = m_items[i];
 
