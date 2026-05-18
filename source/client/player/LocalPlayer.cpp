@@ -13,6 +13,7 @@
 #include "network/packets/PlayerEquipmentPacket.hpp"
 #include "client/gui/screens/inventory/CraftingScreen.hpp"
 #include "client/gui/screens/inventory/ChestScreen.hpp"
+#include "client/gui/screens/inventory/FurnaceScreen.hpp"
 
 int dword_250ADC, dword_250AE0;
 
@@ -22,15 +23,17 @@ void LocalPlayer::_init()
 	// multiplayer related
 	m_lastSentPos = Vec3::ZERO;
 	m_lastSentRot = Vec2::ZERO;
+	m_lastSelectedStackId = m_pInventory->m_selectedStackId;
 	// multiplayer related -- end
 
 	m_renderArmRot = Vec2::ZERO;
 	m_lastRenderArmRot = Vec2::ZERO;
-	m_lastSelectedSlot = m_pInventory->getSelectedItemId();
 }
 
 LocalPlayer::LocalPlayer(Minecraft* pMinecraft, Level* pLevel, User* pUser, GameType playerGameType, int dimensionId) : Player(pLevel, playerGameType)
 {
+	m_lastSelectedStackId = 0;
+
 	field_BEC = 0;
 	field_BF0 = Vec3::ZERO;
 	field_BFC = 0.0f;
@@ -42,7 +45,6 @@ LocalPlayer::LocalPlayer(Minecraft* pMinecraft, Level* pLevel, User* pUser, Game
 	field_C14 = 0.0f;
 	field_C18 = 0.0f;
 	field_C1C = 0.0f;
-	m_lastSelectedSlot = 0;
 	m_pMoveInput = nullptr;
 
 	m_pMinecraft = pMinecraft;
@@ -59,7 +61,11 @@ LocalPlayer::~LocalPlayer()
 void LocalPlayer::die(Entity* pCulprit)
 {
 #if NETWORK_PROTOCOL_VERSION >= 4
+#ifdef FEATURE_SERVER_INVENTORIES
 	m_pInventory->dropAll();
+#else
+	m_pInventory->dropAll(m_pLevel->m_bIsClientSide);
+#endif
 #endif
 
 	Player::die(pCulprit);
@@ -132,18 +138,24 @@ void LocalPlayer::swing()
 void LocalPlayer::startCrafting(const TilePos& pos)
 {
 	m_pMinecraft->getScreenChooser()->pushCraftingScreen(this, pos);
+
+	Player::startCrafting(pos);
 }
 
-/*void LocalPlayer::openFurnace(FurnaceTileEntity* furnace)
+void LocalPlayer::openFurnace(FurnaceTileEntity* furnace)
 {
 	// PE 0.3.2 doesn't let you cook in creative mode
-	m_pMinecraft->setScreen(new FurnaceScreen(m_pInventory, furnace));
-}*/
+	m_pMinecraft->getScreenChooser()->pushFurnaceScreen(this, furnace);
+
+	Player::openFurnace(furnace);
+}
 
 void LocalPlayer::openContainer(Container* container)
 {
 	// PE 0.3.2 doesn't let you open chests in creative mode
 	m_pMinecraft->getScreenChooser()->pushChestScreen(this, container);
+
+	Player::openContainer(container);
 }
 
 void LocalPlayer::closeContainer()
@@ -156,11 +168,15 @@ void LocalPlayer::closeContainer()
 /*void LocalPlayer::openTrap(DispenserTileEntity* tileEntity)
 {
 	m_pMinecraft->setScreen(new TrapScreen(m_pInventory, tileEntity));
+
+	Player::openTrap(tileEntity);
 }*/
 
 /*void LocalPlayer::openTextEdit(SignTileEntity* tileEntity)
 {
 	m_pMinecraft->setScreen(new TextEditScreen(tileEntity));
+
+	Player::openTextEdit(tileEntity);
 }*/
 
 void LocalPlayer::reset()
@@ -247,6 +263,9 @@ bool LocalPlayer::isSneaking() const
 void LocalPlayer::move(const Vec3& pos)
 {
 	LocalPlayer* pLP = m_pMinecraft->m_pLocalPlayer;
+	if (!pLP)
+		return;
+
 	if (Minecraft::DEADMAU5_CAMERA_CHEATS && pLP == this && m_pMinecraft->getOptions()->m_flightHax.get())
 	{
 		//@HUH: Using m_pMinecraft->m_pLocalPlayer instead of this, even though they're the same
@@ -329,9 +348,9 @@ void LocalPlayer::tick()
 	{
 		sendPosition();
 
-		if (m_lastSelectedSlot != m_pInventory->m_selectedSlot)
+		if (m_lastSelectedStackId != m_pInventory->m_selectedStackId)
 		{
-			m_lastSelectedSlot = m_pInventory->m_selectedSlot;
+			m_lastSelectedStackId = m_pInventory->m_selectedStackId;
 			const ItemStack& item = m_pInventory->getSelectedItem();
 			m_pMinecraft->m_pRakNetInstance->send(new PlayerEquipmentPacket(m_EntityID, item.getId(), item.getAuxValue()));
 		}

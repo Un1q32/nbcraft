@@ -15,6 +15,14 @@ void MultiplayerLocalPlayer::reallyDrop(ItemEntity* itemEntity)
 {
 }
 
+void MultiplayerLocalPlayer::_handleOpenedContainerMenu()
+{
+    if (m_pContainerMenu)
+        m_pContainerMenu->addSlotListener(this);
+    else
+        LOG_W("Tried to add MultiplayerLocalPlayer as ContainerListener for NULL container!");
+}
+
 bool MultiplayerLocalPlayer::hurt(Entity* pAttacker, int damage)
 {
     // Java returns false
@@ -70,10 +78,11 @@ void MultiplayerLocalPlayer::heal(int health)
 {
 }
 
+// @PARITY: From Java
+// Uncomment when we have fully server-authoritative inventories
 /*void MultiplayerLocalPlayer::drop()
 {
-    // @PARITY: From Java
-	m_pLevel->m_pRakNetInstance->send(new PlayerActionPacket(PlayerActionPacket::DROP_ITEM))
+    m_pLevel->m_pRakNetInstance->send(new PlayerActionPacket(m_EntityID, PlayerActionPacket::DROP_ITEM));
 }*/
 
 void MultiplayerLocalPlayer::hurtTo(int newHealth)
@@ -92,16 +101,14 @@ void MultiplayerLocalPlayer::hurtTo(int newHealth)
 void MultiplayerLocalPlayer::die(Entity* pCulprit)
 {
 #if NETWORK_PROTOCOL_VERSION >= 4
-    SendInventoryPacket* pPkt = new SendInventoryPacket();
-    pPkt->m_entityId = m_EntityID;
-    pPkt->m_bDropAll = true;
+    SendInventoryPacket* pPkt = new SendInventoryPacket(m_EntityID, true);
 
-    uint16_t size = m_pInventory->getContainerSize();
+    Container::Size size = m_pInventory->getContainerSize();
 
     // 0.3.0
     if (size > 9)
     {
-        for (int i = 0; i < size; i++)
+        for (Container::StackID i = 0; i < size; i++)
         {
             pPkt->m_items.push_back(m_pInventory->getItem(i));
         }
@@ -133,7 +140,9 @@ void MultiplayerLocalPlayer::refreshContainer(ContainerMenu* menu, const std::ve
 {
 }
 
-void MultiplayerLocalPlayer::slotChanged(ContainerMenu* menu, int index, ItemStack& item, bool isResultSlot)
+void MultiplayerLocalPlayer::slotChanged(ContainerMenu* menu, Container::SlotID slotId, Slot* slot, ItemStack& item, bool isResultSlot)
 {
-    // @TODO: Replicate ContainerSetSlotPacket
+#if NETWORK_PROTOCOL_VERSION >= 5
+    m_pMinecraft->m_pRakNetInstance->send(new ContainerSetSlotPacket(menu->m_containerId, slotId, item));
+#endif
 }

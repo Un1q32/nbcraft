@@ -169,6 +169,13 @@ public:
 		(*this) += -b;
 	}
 
+	void operator*=(const Vec3& b)
+	{
+		x *= b.x;
+		y *= b.y;
+		z *= b.z;
+	}
+
 	void operator+=(float f)
 	{
 		x += f;

@@ -154,17 +154,36 @@ void ServerSideNetworkHandler::handle(const RakNet::RakNetGUID& guid, LoginPacke
 
 	m_pendingPlayers[guid] = pPlayer;
 
-	StartGamePacket sgp;
-	sgp.m_seed = m_pLevel->getSeed();
-	sgp.m_levelVersion = m_pLevel->getLevelData()->getStorageVersion();
-	sgp.m_gameType = pPlayer->getPlayerGameType();
-	sgp.m_entityId = pPlayer->m_EntityID;
-	sgp.m_time = m_pLevel->getTime();
-	sgp.m_pos = pPlayer->m_pos;
-	sgp.m_pos.y -= pPlayer->m_heightOffset;
-	
-	sgp.write(bs);
-	m_pRakNetPeer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, guid, false);
+	// Ensure Player is spawned above-ground
+	{
+		Vec3& pos = pPlayer->m_pos;
+		while (pos.y > 0)
+		{
+			pPlayer->setPos(pos);
+			if (pPlayer->canSpawn())
+				break;
+			pos.y++;
+		}
+
+		Vec3 pos2 = pos;
+		pos2.y -= pPlayer->m_heightOffset;
+		pPlayer->moveTo(pos2, pPlayer->m_rot);
+	}
+
+	// Send StartGamePacket
+	{
+		StartGamePacket sgp;
+		sgp.m_seed = m_pLevel->getSeed();
+		sgp.m_levelVersion = m_pLevel->getLevelData()->getStorageVersion();
+		sgp.m_gameType = pPlayer->getPlayerGameType();
+		sgp.m_entityId = pPlayer->m_EntityID;
+		sgp.m_time = m_pLevel->getTime();
+		sgp.m_pos = pPlayer->m_pos;
+		sgp.m_pos.y -= pPlayer->m_heightOffset;
+
+		sgp.write(bs);
+		m_pRakNetPeer->Send(&bs, HIGH_PRIORITY, RELIABLE_ORDERED, 0, guid, false);
+	}
 
 #if NETWORK_PROTOCOL_VERSION <= 2
 	// emulate a ReadyPacket being received
@@ -218,9 +237,9 @@ void ServerSideNetworkHandler::handle(const RakNet::RakNetGUID& guid, ReadyPacke
 
 #if NETWORK_PROTOCOL_VERSION >= 3
 	// send the connecting player info about all entities in the world
-	for (size_t i = 0; i < m_pLevel->m_entities.size(); i++)
+	for (EntityMap::iterator it = m_pLevel->m_entities.begin(); it != m_pLevel->m_entities.end(); ++it)
 	{
-		Entity* entity = m_pLevel->m_entities[i];
+		Entity* entity = it->second;
 		if (canReplicateEntity(entity))
 		{
 			AddMobPacket packet(*((Mob*)entity));
@@ -396,7 +415,12 @@ void ServerSideNetworkHandler::handle(const RakNet::RakNetGUID& guid, PlayerEqui
 		return;
 	}
 
+#ifdef FEATURE_SERVER_INVENTORIES
+	// will need to be reworked for proper server-sided inventory support, pick the proper slot, not just any item
 	pPlayer->m_pInventory->pickItem(packet->m_itemID, packet->m_itemAuxValue, C_MAX_HOTBAR_ITEMS);
+#else
+	pPlayer->m_pInventory->setSelectedItem(ItemStack(packet->m_itemID, 1, packet->m_itemAuxValue));
+#endif
 
 	redistributePacket(packet, guid);
 }
@@ -480,6 +504,23 @@ void ServerSideNetworkHandler::handle(const RakNet::RakNetGUID& guid, UseItemPac
 	pPlayer->swing();
 }
 
+// added specifically to allow Noteblocks to work, but ideally should just be a part of ServerPlayerGameMode
+bool _startDestroyBlock(Level& level, Player& player, const TilePos& pos, Facing::Name face)
+{
+	ItemStack& item = player.getSelectedItem();
+	if (!item.isEmpty() && item.getItem() == Item::bow)
+		return true;
+
+	TileID tile = level.getTile(pos);
+
+	if (tile <= 0)
+		return false;
+	
+	Tile::tiles[tile]->attack(&level, pos, &player);
+
+	return true;
+}
+
 void ServerSideNetworkHandler::handle(const RakNet::RakNetGUID& guid, PlayerActionPacket* packet)
 {
 	puts_ignorable("PlayerActionPacket");
@@ -494,6 +535,13 @@ void ServerSideNetworkHandler::handle(const RakNet::RakNetGUID& guid, PlayerActi
 
 	switch (packet->m_action)
 	{
+	case PlayerActionPacket::START_DESTROY_BLOCK:
+		_startDestroyBlock(*m_pLevel, *pPlayer, packet->m_tilePos, packet->m_tileFace);
+		//m_pMinecraft->getPlayerGameMode(*pPlayer)->startDestroyBlock(pPlayer, packet->m_tilePos, packet->m_tileFace);
+		break;
+	case PlayerActionPacket::STOP_DESTROY_BLOCK:
+		//m_pMinecraft->getPlayerGameMode(*pPlayer)->stopDestroyBlock(pPlayer, packet->m_tilePos, packet->m_tileFace);
+		break;
 	case PlayerActionPacket::STOP_USING_ITEM:
 		pPlayer->releaseUsingItem();
 		break;
@@ -595,7 +643,7 @@ void ServerSideNetworkHandler::handle(const RakNet::RakNetGUID& guid, SendInvent
 
 	pPlayer->m_pInventory->replace(packet->m_items);
 
-	if (packet->m_bDropAll)
+	if (packet->m_extra == SendInventoryPacket::EXTRA_DROP_ALL)
 		pPlayer->m_pInventory->dropAll();
 }
 
@@ -647,15 +695,26 @@ void ServerSideNetworkHandler::handle(const RakNet::RakNetGUID& guid, ContainerS
 		return;
 
 	ContainerMenu* pContainerMenu = pPlayer->m_pContainerMenu;
+	bool isInventory = false;
+
+	// @HACK: LocalPlayer inventory seems to always have Container ID 0
+	if (packet->m_containerId == 0)
+	{
+		pContainerMenu = pPlayer->m_pInventoryMenu;
+		isInventory = true;
+	}
+
 	if (!pContainerMenu)
 		return;
 
-	if (pContainerMenu->m_containerId == packet->m_containerId)
+	if (pContainerMenu->m_containerId == packet->m_containerId
+		|| (isInventory && packet->m_containerId == 0)) 
 	{
 		switch (pContainerMenu->m_containerType)
 		{
 		case Container::FURNACE:
-			pContainerMenu->setItem(packet->m_slot, packet->m_item);
+		case Container::CONTAINER:
+			pContainerMenu->setItem(packet->m_slotId, packet->m_item);
 			break;
 		default:
 			break;

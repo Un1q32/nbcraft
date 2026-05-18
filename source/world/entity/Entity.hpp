@@ -119,7 +119,7 @@ public:
 	Entity(Level*);
 	virtual ~Entity();
 
-protected:
+public:
 	virtual bool getSharedFlag(SharedFlag flag) const;
 	virtual void setSharedFlag(SharedFlag flag, bool value);
 	virtual void playStepSound(const TilePos& pos, TileID tileId);
@@ -175,7 +175,7 @@ public:
 	virtual bool isPushable() const { return false; }
 	virtual bool isShootable() const { return false; }
 	virtual bool isOnFire() const { return m_fireTicks > 0 || getSharedFlag(FLAG_ON_FIRE); }
-	virtual bool isRiding() const { return /*m_pRiding != nullptr ||*/ getSharedFlag(FLAG_RIDING); }
+	virtual bool isRiding() const { return getRiding() || getSharedFlag(FLAG_RIDING); }
 	virtual bool isSneaking() const { return getSharedFlag(FLAG_SNEAKING); }
 	virtual void setSneaking(bool value) { setSharedFlag(FLAG_SNEAKING, value); }
 	virtual bool isAlive() const { return m_bRemoved; }
@@ -206,9 +206,18 @@ public:
 	virtual RenderType queryEntityRenderer() const;
 	virtual const AABB* getCollideBox() const;
 	virtual AABB* getCollideAgainstBox(Entity* ent) const;
+	virtual void rideTick();
 	virtual void handleInsidePortal();
 	virtual void handleEntityEvent(EventType::ID eventId);
 	//virtual void thunderHit(LightningBolt*);
+	virtual void positionRider();
+	virtual void ride(Entity*);
+	virtual float getRideHeight() const { return m_bbHeight * 0.75f; }
+	virtual float getRidingHeight() const { return m_heightOffset; }
+	Entity* getRiding() const;
+	Entity* getRider() const;
+	void setRiding(Entity* ent);
+	void setRider(Entity* ent);
 	void load(const CompoundTag& tag);
 	bool save(CompoundTag& tag) const;
 	void saveWithoutId(CompoundTag& tag) const;
@@ -233,6 +242,10 @@ public:
 			(m_pos.z - pos.z) * (m_pos.z - pos.z);
 	}
 
+private:
+	Entity::ID m_ridingId;
+	Entity::ID m_riderId;
+
 protected:
 	SynchedEntityData m_entityData;
 	bool m_bMakeStepSound;
@@ -247,12 +260,14 @@ public:
 	float m_viewScale;
 	//TileSource* m_pTileSource;
 	DimensionId m_dimensionId;
+	bool m_bRiding;
 	bool m_bBlocksBuilding;
 	Level* m_pLevel;
 	Vec3 m_oPos; // "o" in Java or "xo" "yo" "zo"
 	Vec3 m_vel;
 	Vec2 m_rot;
 	Vec2 m_oRot; // "RotO" in Java or "xRotO" "yRotO"
+	Vec2 m_rideRot;
 	Color m_tintColor;
 	AABB m_hitbox;
 	bool m_bOnGround;

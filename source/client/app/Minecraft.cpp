@@ -185,12 +185,12 @@ void Minecraft::_initGameModes(Level& level)
 	}
 }
 
-void Minecraft::_reloadInput()
+void Minecraft::reloadInput()
 {
 	if (m_pInputHolder)
 		delete m_pInputHolder;
 
-	if (isTouchscreen())
+	if (useTouchscreen())
 	{
 		m_pInputHolder = new TouchInputHolder(this, getOptions());
 	}
@@ -258,7 +258,7 @@ void Minecraft::grabMouse()
 	// This will call grabMouse again, so why are we calling it here?
 	//setScreen(nullptr);
 
-	if (useController() || isTouchscreen())
+	if (useController() || useTouchscreen())
 		return; // don't actually try to grab the mouse
 
 	platform()->setMouseGrabbed(true);
@@ -266,7 +266,7 @@ void Minecraft::grabMouse()
 
 void Minecraft::recenterMouse()
 {
-	if (useController() || isTouchscreen())
+	if (useController() || useTouchscreen())
 		return;
 
 	platform()->recenterMouse();
@@ -376,9 +376,14 @@ bool Minecraft::isTouchscreen() const
 	return m_bIsTouchscreen;
 }
 
+bool Minecraft::useTouchscreen() const
+{
+	return isTouchscreen() && !getOptions()->m_bUseController.get();
+}
+
 bool Minecraft::useSplitControls() const
 {
-	return !m_bIsTouchscreen || getOptions()->m_splitControls.get();
+	return !useTouchscreen() || getOptions()->m_splitControls.get();
 }
 
 bool Minecraft::useController() const
@@ -616,17 +621,7 @@ void Minecraft::tickInput()
 			}
 			else if (getOptions()->isKey(KM_DROP, keyCode))
 			{
-				ItemStack& item = m_pLocalPlayer->m_pInventory->getSelected();
-				if (!item.isEmpty())
-				{
-					ItemStack itemDrop(item);
-					itemDrop.m_count = 1;
-
-					if (m_pLocalPlayer->isSurvival())
-						item.shrink(1);
-
-					m_pLocalPlayer->drop(itemDrop);
-				}
+				m_pLocalPlayer->drop();
 			}
 			else if (getOptions()->isKey(KM_TOGGLEGUI, keyCode))
 			{
@@ -694,7 +689,7 @@ void Minecraft::tickMouse()
 	 * This is exactly what Minecraft Java does too
 	**/
 
-	if (useController() || isTouchscreen())
+	if (useController() || useTouchscreen())
 		return; // don't actually try to recenter the mouse
 
     if (platform()->getRecenterMouseEveryTick()) // just for SDL1
