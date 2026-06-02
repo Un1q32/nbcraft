@@ -242,12 +242,15 @@ public: // static variables
 		* glowstone,
 		* web,
 		* fence,
+		* fenceGate,
 		* craftingTable,
 		* crops,
 		* furnace,
 		* furnaceLit,
 		* musicBlock,
-		* chest;
+		* chest,
+		* cake,
+		* trapDoor;
 
 public:
 	int m_TextureFrame;

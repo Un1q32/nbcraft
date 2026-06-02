@@ -468,7 +468,10 @@ add_library(nbcraft-core STATIC
     world/tile/GlowstoneTile.cpp
     world/tile/Web.cpp
     world/tile/FenceTile.cpp
+    world/tile/FenceGateTile.cpp
     world/tile/CraftingTableTile.cpp
+	world/tile/TrapDoorTile.cpp
+	world/tile/CakeTile.cpp
     world/tile/entity/TileEntity.cpp
     world/tile/entity/TileEntityType.cpp
     world/tile/entity/ChestTileEntity.cpp
