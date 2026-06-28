@@ -419,6 +419,7 @@ add_library(nbcraft-core STATIC
 	world/item/EggItem.cpp
     world/item/SlabItem.cpp
 	world/item/SnowballItem.cpp
+    world/item/BucketItem.cpp
     world/particle/RedDustParticle.cpp
     world/particle/TerrainParticle.cpp
     world/particle/NoteParticle.cpp

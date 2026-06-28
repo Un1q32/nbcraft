@@ -30,6 +30,7 @@
 #include "ToolItem.hpp"
 #include "TilePlanterItem.hpp"
 #include "WeaponItem.hpp"
+#include "BucketItem.hpp"
 
 #define ITEM(x) ((x) - 256)
 
@@ -426,19 +427,19 @@ void Item::initItems()
 		->setIcon(11, 2)
 		->setDescriptionId("doorWood");
 
-	Item::bucket_empty = NEW_ITEM(ITEM_BUCKET)
+	Item::bucket_empty = NEW_X_ITEM(BucketItem, ITEM_BUCKET, TILE_AIR)
 		->setIcon(10, 4)
 		->setDescriptionId("bucket");
 
-	Item::bucket_water = NEW_ITEM(ITEM_BUCKET_WATER)
+	Item::bucket_water = NEW_X_ITEM(BucketItem, ITEM_BUCKET_WATER, TILE_WATER)
 		->setIcon(11, 4)
-		->setDescriptionId("bucketWater");
-		//->setCraftingRemainingItem(emptyBucket);
+		->setDescriptionId("bucketWater")
+		->setCraftingRemainingItem(bucket_empty);
 
-	Item::bucket_lava = NEW_ITEM(ITEM_BUCKET_LAVA)
+	Item::bucket_lava = NEW_X_ITEM(BucketItem, ITEM_BUCKET_LAVA, TILE_LAVA)
 		->setIcon(12, 4)
-		->setDescriptionId("bucketLava");
-		//>setCraftingRemainingItem(emptyBucket);
+		->setDescriptionId("bucketLava")
+		->setCraftingRemainingItem(bucket_empty);
 
 	Item::minecart = NEW_ITEM(ITEM_MINECART)
 		->setIcon(7, 8)
@@ -478,8 +479,9 @@ void Item::initItems()
 
 	Item::milk = NEW_ITEM(ITEM_BUCKET_MILK)
 		->setIcon(13, 4)
-		->setDescriptionId("milk");
-		//->setCraftingRemainingItem(emptyBucket);
+		->setDescriptionId("milk")
+		->setMaxStackSize(1)
+		->setCraftingRemainingItem(bucket_empty);
 
 	Item::brick = NEW_ITEM(ITEM_BRICK)
 		->setIcon(6, 1)
@@ -618,9 +620,9 @@ float Item::getDestroySpeed(ItemStack* instance, const Tile* tile) const
 	return 1.0f;
 }
 
-ItemStack* Item::use(ItemStack* instance, Level* level, Mob* user) const
+bool Item::use(ItemStack& item, Level* level, Mob& user) const
 {
-	return instance;
+	return false;
 }
 
 void Item::releaseUsing(ItemStack& item, Level& level, Mob& user, int durationLeft) const
