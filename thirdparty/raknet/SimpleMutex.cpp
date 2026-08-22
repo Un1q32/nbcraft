@@ -73,12 +73,10 @@ SimpleMutex::~SimpleMutex()
 #ifdef _WIN32
 	//	CloseHandle(hMutex);
 	DeleteCriticalSection(&criticalSection);
-
-
-
-
-
-
+#elif defined(__VITA__)
+	int error = sceKernelDeleteLwMutex(&mutex);
+	(void) error;
+	RakAssert(error == 0)
 #else
 	pthread_mutex_destroy(&hMutex);
 #endif
@@ -133,12 +131,10 @@ void SimpleMutex::Lock(void)
 	RakAssert(d==WAIT_OBJECT_0);
 	*/
 	EnterCriticalSection(&criticalSection);
-
-
-
-
-
-
+#elif defined(__VITA__)
+	int error = sceKernelLockLwMutex(&mutex, 1, NULL);
+	(void) error;
+	RakAssert(error==0);
 #else
 	int error = pthread_mutex_lock(&hMutex);
 	(void) error;
@@ -153,12 +149,10 @@ void SimpleMutex::Unlock(void)
 #ifdef _WIN32
 	//	ReleaseMutex(hMutex);
 	LeaveCriticalSection(&criticalSection);
-
-
-
-
-
-
+#elif defined(__VITA__)
+	int error = sceKernelUnlockLwMutex(&mutex, 1);
+	(void) error;
+	RakAssert(error==0);
 #else
 	int error = pthread_mutex_unlock(&hMutex);
 	(void) error;
@@ -174,14 +168,10 @@ void SimpleMutex::Init(void)
 	//	hMutex = CreateMutex(NULL, FALSE, 0);
 	//	RakAssert(hMutex);
 	InitializeCriticalSection(&criticalSection);
-
-
-
-
-
-
-
-
+#elif defined(__VITA__)
+	int error = sceKernelCreateLwMutex(&mutex, "SimpleMutex", 0, 0, NULL);
+	(void) error;
+	RakAssert(error>=0);
 #else
 	int error = pthread_mutex_init(&hMutex, 0);
 	(void) error;

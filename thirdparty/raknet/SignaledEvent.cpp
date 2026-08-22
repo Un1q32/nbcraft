@@ -27,8 +27,7 @@ SignaledEvent::SignaledEvent()
 {
 #ifdef _WIN32
 	eventList=INVALID_HANDLE_VALUE;
-
-
+#elif defined(__VITA__)
 #else
 	isSignaled=false;
 #endif
@@ -44,15 +43,9 @@ void SignaledEvent::InitEvent(void)
 		eventList=CreateEventEx(0, 0, 0, 0);
 #elif defined(_WIN32)
 		eventList=CreateEvent(0, false, false, 0);
-
-
-
-
-
-
-
-
-
+#elif defined(__VITA__)
+	sceKernelCreateLwMutex(&mutex, "SignaledEvent", 0, 0, NULL);
+	sceKernelCreateLwCond(&cond, "SignaledEvent", 0, &mutex, NULL);
 #else
 
 #if !defined(ANDROID)
@@ -74,15 +67,9 @@ void SignaledEvent::CloseEvent(void)
 		CloseHandle(eventList);
 		eventList=INVALID_HANDLE_VALUE;
 	}
-
-
-
-
-
-
-
-
-
+#elif defined(__VITA__)
+	sceKernelDeleteLwCond(&cond);
+	sceKernelDeleteLwMutex(&mutex);
 #else
 	pthread_cond_destroy(&eventList);
 	pthread_mutex_destroy(&hMutex);
@@ -97,16 +84,8 @@ void SignaledEvent::SetEvent(void)
 {
 #ifdef _WIN32
 	::SetEvent(eventList);
-
-
-
-
-
-
-
-
-
-
+#elif defined(__VITA__)
+	sceKernelSignalLwCondAll(&cond);
 #else
 	// Different from SetEvent which stays signaled.
 	// We have to record manually that the event was signaled
@@ -128,46 +107,9 @@ void SignaledEvent::WaitOnEvent(int timeoutMs)
 //		false,
 //		timeoutMs);
 	WaitForSingleObjectEx(eventList,timeoutMs,FALSE);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#elif defined(__VITA__)
+	unsigned int timeout_us = timeoutMs * 1000;
+	sceKernelWaitLwCond(&cond, &timeout_us);
 
 #else
 

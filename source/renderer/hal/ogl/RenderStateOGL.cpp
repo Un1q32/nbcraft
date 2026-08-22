@@ -38,8 +38,13 @@ bool RenderStateOGL::bindRenderState(RenderContext& context, bool forceBind)
 
     if (forceBind || ctxDesc.rescaleNormals != m_description.rescaleNormals)
     {
-        if (m_bRescaleNormals) glEnable(GL_RESCALE_NORMAL);
-        else                   glDisable(GL_RESCALE_NORMAL);
+        if (m_bRescaleNormals)
+            glEnable(GL_RESCALE_NORMAL);
+// vitaGL's glDisable doesn't support GL_RESCALE_NORMAL (GL_INVALID_ENUM)
+#if !defined(__VITA__)
+        else
+            glDisable(GL_RESCALE_NORMAL);
+#endif
         ctxDesc.rescaleNormals = m_description.rescaleNormals;
     }
 

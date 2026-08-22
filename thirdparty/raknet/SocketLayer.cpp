@@ -49,6 +49,17 @@ using namespace pp;
 //SocketLayerOverride *SocketLayer::slo=0;
 
 #ifdef _WIN32
+#elif defined(__VITA__)
+#include <string.h> // memcpy
+#include <unistd.h>
+#include <fcntl.h>
+#include <arpa/inet.h>
+#include <errno.h>  // error numbers
+#include <stdio.h> // RAKNET_DEBUG_PRINTF
+#include <sys/socket.h>
+#include <psp2/net/netctl.h>
+#define SCE_NET_CTL_INFO_IP_ADDRESS 15
+#define SCE_NET_CTL_INFO_NETMASK 16
 #else
 #include <string.h> // memcpy
 #include <unistd.h>
@@ -234,6 +245,24 @@ RakNet::RakString SocketLayer::GetSubNetForSocketAndIp(__UDPSOCKET__ inSock, Rak
 		}
 	}
 	return "";
+#elif defined(__VITA__)
+
+	SceNetCtlInfo info;
+	int ret = sceNetCtlInetGetInfo(SCE_NET_CTL_INFO_IP_ADDRESS, &info);
+	if (ret < 0)
+		return "";
+
+	if (inIpString == info.ip_address)
+	{
+		SceNetCtlInfo maskInfo;
+		ret = sceNetCtlInetGetInfo(SCE_NET_CTL_INFO_NETMASK, &maskInfo);
+		if (ret < 0)
+			return "";
+
+		return maskInfo.ip_address;
+	}
+
+	return netMaskString;
 #else
 
 	int fd,fd2;
@@ -284,7 +313,6 @@ RakNet::RakString SocketLayer::GetSubNetForSocketAndIp(__UDPSOCKET__ inSock, Rak
 
 	close(fd2);
 	return "";
-
 #endif
 #else
 return "";
@@ -456,6 +484,20 @@ void GetMyIP_Win32( SystemAddress addresses[MAXIMUM_NUMBER_OF_INTERNAL_IDS] )
 #endif
 }
 
+#endif // defined(WINDOWS_STORE_RT)
+
+#ifdef __VITA__
+void GetMyIP_Vita( SystemAddress addresses[MAXIMUM_NUMBER_OF_INTERNAL_IDS] )
+{
+	SceNetCtlInfo info;
+	int ret = sceNetCtlInetGetInfo(SCE_NET_CTL_INFO_IP_ADDRESS, &info);
+	if(ret < 0) {
+		return;
+	}
+	sockaddr_in address;
+	inet_pton(AF_INET, info.ip_address, &address);
+	memcpy(&addresses[0].address.addr4, &address ,sizeof(sockaddr_in));
+}
 #endif
 
 
@@ -469,6 +511,8 @@ void SocketLayer::GetMyIP( SystemAddress addresses[MAXIMUM_NUMBER_OF_INTERNAL_ID
 
 #if   defined(WINDOWS_STORE_RT)
 	GetMyIP_WinRT(addresses);
+#elif defined(__VITA__)
+	GetMyIP_Vita(addresses);
 #elif defined(_WIN32)
 	GetMyIP_Win32(addresses);
 #else

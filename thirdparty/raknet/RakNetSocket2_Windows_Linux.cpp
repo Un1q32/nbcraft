@@ -178,7 +178,7 @@ void GetMyIP_Windows_Linux_IPV4( SystemAddress addresses[MAXIMUM_NUMBER_OF_INTER
 
 	if ( phe == 0 )
 	{
-		printf("gethostbyname hostname: %s, errno: %d\n", ac, h_errno);
+		printf("gethostbyname hostname: %s, errno: %d\n", ac, errno);
 		RakAssert(phe!=0);
 		return ;
 	}

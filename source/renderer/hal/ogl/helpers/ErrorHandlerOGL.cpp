@@ -1,3 +1,5 @@
+#include <typeinfo>
+
 #include "ErrorHandlerOGL.hpp"
 #include "common/Logger.hpp"
 
@@ -10,7 +12,10 @@ void ErrorHandlerOGL::checkForErrors()
 	if (__err != GL_NO_ERROR)
 	{
 		LOG_E("OpenGL Error: 0x%X", __err);
+// On the Vita an uncaught exception just terminates the game
+#ifndef __VITA__
 		throw std::bad_cast();
+#endif
 	}
 #endif
 }

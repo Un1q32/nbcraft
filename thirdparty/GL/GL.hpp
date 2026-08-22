@@ -31,7 +31,14 @@
 //#define MC_GL_DEBUG_OUTPUT
 
 #ifdef USE_GLES
-	#if MC_PLATFORM_IOS
+	#if defined(__vita__)
+		#include <vitaGL.h>
+		// vitaGL provides the GLES 1.x API but doesn't define this version macro,
+		// which GL.hpp uses below to map the xgl* helpers to their GLES equivalents
+		#ifndef GL_VERSION_ES_CM_1_0
+			#define GL_VERSION_ES_CM_1_0 1
+		#endif
+	#elif MC_PLATFORM_IOS
         #ifdef FEATURE_GFX_SHADERS
                 #include <OpenGLES/ES2/gl.h>
                 #include <OpenGLES/ES2/glext.h>
@@ -46,6 +53,15 @@
 	#endif
     #ifndef GL_NONE
         #define GL_NONE 0x0
+    #endif
+    #ifndef GL_RESCALE_NORMAL
+        #define GL_RESCALE_NORMAL 0x803A
+    #endif
+    #ifndef GL_LINE_SMOOTH
+        #define GL_LINE_SMOOTH 0x0B20
+    #endif
+    #ifndef GL_SMOOTH_LINE_WIDTH_RANGE
+        #define GL_SMOOTH_LINE_WIDTH_RANGE 0x0B22
     #endif
     #ifndef GL_UNSIGNED_INT
         #define GL_UNSIGNED_INT 0x1405

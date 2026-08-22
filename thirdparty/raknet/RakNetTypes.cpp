@@ -30,6 +30,8 @@
 #elif defined(XENON)
 #include <lwip/sockets.h>
 #include <lwip/inet.h>
+#elif defined(__VITA__)
+#include <strings.h>
 #else
 #include <sys/socket.h>
 #include <netinet/in.h>

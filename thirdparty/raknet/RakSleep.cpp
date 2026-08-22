@@ -10,6 +10,8 @@
 
 #if   defined(_WIN32)
 #include "WindowsIncludes.h" // Sleep
+#elif defined(__VITA__)
+#include <psp2/kernel/threadmgr.h>
 
 
 
@@ -40,6 +42,8 @@ void RakSleep(unsigned int ms)
 {
 #ifdef _WIN32
 	Sleep(ms);
+#elif defined(__VITA__)
+	sceKernelDelayThread(ms * 1000);
 
 
 

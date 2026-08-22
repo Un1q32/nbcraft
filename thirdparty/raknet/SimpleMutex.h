@@ -22,8 +22,8 @@
 
 #if   defined(_WIN32)
 #include "WindowsIncludes.h"
-
-
+#elif defined(__VITA__)
+#include <psp2/kernel/threadmgr.h>
 #else
 #include <pthread.h>
 #ifdef XENON
@@ -66,8 +66,8 @@ private:
 	void Init(void);
 #ifdef _WIN32
 	CRITICAL_SECTION criticalSection; /// Docs say this is faster than a mutex for single process access
-
-
+#elif defined(__VITA__)
+	SceKernelLwMutexWork mutex;
 #else
 	pthread_mutex_t hMutex;
 #endif

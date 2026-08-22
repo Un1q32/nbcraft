@@ -40,14 +40,16 @@ using namespace RakNet;
 #include <ifaddrs.h>
 #endif
 #include <netinet/in.h>
-#if !defined(__DREAMCAST__)
+#if !defined(__DREAMCAST__) && !defined(__VITA__)
 #include <net/if.h>
 #else
 #define IP_HDRINCL 3
 #endif
 #include <sys/types.h>
 #include <sys/socket.h>
+#if !defined(__VITA__)
 #include <sys/ioctl.h>
+#endif
 #endif
 #endif
 

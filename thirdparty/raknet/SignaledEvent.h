@@ -15,9 +15,8 @@
 
 #if   defined(_WIN32)
 #include "WindowsIncludes.h"
-
-
-
+#elif defined(__VITA__)
+#include <psp2/kernel/threadmgr.h>
 #else
 	#include <pthread.h>
 	#ifdef XENON
@@ -50,11 +49,9 @@ public:
 protected:
 #ifdef _WIN32
 	HANDLE eventList;
-
-
-
-
-
+#elif defined(__VITA__)
+	SceKernelLwMutexWork mutex;
+	SceKernelLwCondWork cond;
 #else
 	SimpleMutex isSignaledMutex;
 	bool isSignaled;

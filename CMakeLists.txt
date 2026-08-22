@@ -106,6 +106,9 @@ elseif(HAIKU) # HaikuOS
     link_libraries(network)
 elseif(ANDROID) # Android
     link_libraries(log)
+elseif(NBC_PLATFORM STREQUAL "vita") # PlayStation Vita
+    # The toolchain only predefines __vita__, but code expects __VITA__
+    add_compile_definitions(__VITA__)
 endif()
 
 # Threading

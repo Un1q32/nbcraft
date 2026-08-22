@@ -43,6 +43,8 @@ public:
 		: CThread_base(func, context)
 	{
 		pthread_attr_init(&m_thrd_attr);
+		// vitasdk's default pthread stack is way too small (~4KB) for things like level generation
+		pthread_attr_setstacksize(&m_thrd_attr, 1024 * 1024);
 		//pthread_attr_setdetachstate(&m_thrd_attr, 1);
 		pthread_create(&m_thrd, &m_thrd_attr, m_func, context);
 	}

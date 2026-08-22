@@ -21,10 +21,9 @@
 
 #include "Export.h"
 
-
-
-
-
+#if defined(__VITA__)
+#include <psp2/kernel/threadmgr.h>
+#endif
 
 #if defined(WINDOWS_PHONE_8) || defined(WINDOWS_STORE_RT)
 #include "../DependentExtensions/WinPhone8/ThreadEmulation.h"
@@ -40,8 +39,8 @@ namespace RakNet
 
 #elif defined(_WIN32)
 #define RAK_THREAD_DECLARATION(functionName) unsigned __stdcall functionName( void* arguments )
-
-
+#elif defined(__VITA__)
+#define RAK_THREAD_DECLARATION(functionName) unsigned functionName( void* arguments )
 #else
 #define RAK_THREAD_DECLARATION(functionName) void* functionName( void* arguments )
 #endif
@@ -73,9 +72,8 @@ public:
 
 #elif defined(_WIN32)
 	static int Create( unsigned __stdcall start_address( void* ), void *arglist, int priority=0);
-
-
-
+#elif defined(__VITA__)
+	static int Create( unsigned start_address( void* ), void *arglist, int priority=0);
 #else
 	static int Create( void* start_address( void* ), void *arglist, int priority=0);
 #endif
