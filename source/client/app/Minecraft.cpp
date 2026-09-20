@@ -1572,4 +1572,8 @@ void Minecraft::SetWindowSize(unsigned int widthP, unsigned int heightP, unsigne
 
 	Minecraft::_logicalWidth   = widthL;
 	Minecraft::_logicalHeight  = heightL;
+
+	// recalculate the point to pixel scale.
+	// This currently assumes that the aspect ratio is the same.
+	SetRenderScaleMultiplier(float(widthP) / float(widthL));
 }

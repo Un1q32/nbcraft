@@ -374,7 +374,7 @@ int main(int argc, char *argv[])
 
 	// Window Size
 #ifdef __EMSCRIPTEN__
-	Minecraft::SetWindowSize(std::stoi(argv[1], std::stoi(argv[2]);
+	Minecraft::SetWindowSize(std::stoi(argv[1], std::stoi(argv[2]));
 #endif
 
 	// Create Window

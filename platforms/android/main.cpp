@@ -336,8 +336,7 @@ static void initWindow(struct engine* engine, struct android_app* app)
     g_AppPlatform.setScreenSize(w, h);
     g_AppPlatform.initAndroidApp(app);
 
-    engine->ninecraftApp->width = w;
-    engine->ninecraftApp->height = h;
+    Minecraft::SetWindowSize(w, h);
 
     if (!engine->initted)
     {
@@ -350,7 +349,7 @@ static void initWindow(struct engine* engine, struct android_app* app)
         engine->ninecraftApp->onGraphicsReset();
     }
 
-    engine->ninecraftApp->sizeUpdate(w, h);
+    engine->ninecraftApp->sizeUpdate();
 
     engine->initted = true;
 
