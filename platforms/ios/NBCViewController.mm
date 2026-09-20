@@ -372,7 +372,6 @@ NSThread *G_drawFrameThread = nil;
         if (touchIndex > -1)
         {
             CGPoint point;
-            float posX, posY;
             if (touch)
             {
                 point = [touch locationInView:self.view];
@@ -382,11 +381,9 @@ NSThread *G_drawFrameThread = nil;
                 point.x = 0, point.y = 0;
                 //point2.x = 0, point2.y = 0;
             }
-            posX = viewScale * point.x;
-            posY = viewScale * point.y;
             
-            Mouse::feed(MOUSE_BUTTON_LEFT, true, posX, posY);
-            Multitouch::feed(MOUSE_BUTTON_LEFT, true, posX, posY, touchIndex);
+            Mouse::feed(MOUSE_BUTTON_LEFT, true, point.x, point.y);
+            Multitouch::feed(MOUSE_BUTTON_LEFT, true, point.x, point.y, touchIndex);
         }
     }
 }
@@ -399,7 +396,6 @@ NSThread *G_drawFrameThread = nil;
         if (touchIndex > -1)
         {
             CGPoint point;
-            float posX, posY;
             if (touch)
             {
                 point = [touch locationInView:self.view];
@@ -409,11 +405,9 @@ NSThread *G_drawFrameThread = nil;
                 point.x = 0, point.y = 0;
                 //point2.x = 0, point2.y = 0;
             }
-            posX = viewScale * point.x;
-            posY = viewScale * point.y;
             
-            Mouse::feed(MOUSE_BUTTON_NONE, false, posX, posY);
-            Multitouch::feed(MOUSE_BUTTON_NONE, false, posX, posY, touchIndex);
+            Mouse::feed(MOUSE_BUTTON_NONE, false, point.x, point.y);
+            Multitouch::feed(MOUSE_BUTTON_NONE, false, point.x, point.y, touchIndex);
         }
     }
 }
@@ -426,7 +420,6 @@ NSThread *G_drawFrameThread = nil;
         if (touchIndex > -1)
         {
             CGPoint point;
-            float posX, posY;
             if (touch)
             {
                 point = [touch locationInView:self.view];
@@ -436,11 +429,9 @@ NSThread *G_drawFrameThread = nil;
                 point.x = 0, point.y = 0;
                 //point2.x = 0, point2.y = 0;
             }
-            posX = viewScale * point.x;
-            posY = viewScale * point.y;
             
-            Mouse::feed(MOUSE_BUTTON_LEFT, false, posX, posY);
-            Multitouch::feed(MOUSE_BUTTON_LEFT, false, posX, posY, touchIndex);
+            Mouse::feed(MOUSE_BUTTON_LEFT, false, point.x, point.y);
+            Multitouch::feed(MOUSE_BUTTON_LEFT, false, point.x, point.y, touchIndex);
         }
     }
 }
