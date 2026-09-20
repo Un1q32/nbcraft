@@ -49,7 +49,7 @@ TouchscreenInput_TestFps::TouchscreenInput_TestFps(Minecraft* pMinecraft, Option
 	for (int i = 0; i < 10; i++)
 		field_6C[i] = 0;
 
-	setScreenSize(Minecraft::GetWidthP(), Minecraft::GetHeightP());
+	setScreenSize(Minecraft::GetViewportSize());
 }
 
 void TouchscreenInput_TestFps::releaseAllKeys()
@@ -98,13 +98,16 @@ static void TransformArray(int count, float* x1, float* y1, float* x2, float* y2
 	AddCoordinateArray(count, x2, y2, xd, yd);
 }
 
-void TouchscreenInput_TestFps::setScreenSize(int width, int height)
+void TouchscreenInput_TestFps::setScreenSize(const ViewportSize& size)
 {
 	m_touchAreaModel.clear();
+    
+    unsigned int width = size.logical.width;
+    unsigned int height = size.logical.height;
 
 	float sizeScale = m_pOptions->m_dpadSize.get();
 	float widthM = float(width) * 0.094f * sizeScale;
-	float heightM = float(width) * 0.094f * sizeScale;
+	float heightM = widthM;
 
 	float x1[4], y1[4], x2[4], y2[4];
 

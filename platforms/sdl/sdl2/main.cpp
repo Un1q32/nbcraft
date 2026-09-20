@@ -162,7 +162,7 @@ static void handle_touch(int x, int y, int type, char id) {
 #ifdef __EMSCRIPTEN__
 extern "C" void resize_from_js(int new_width, int new_height)
 {
-	SDL_SetWindowSize(window, new_width, new_height);
+	SDL_SetViewportSize(window, new_width, new_height);
 }
 #endif
 
@@ -312,7 +312,7 @@ static void resize()
 	SDL_GetWindowSize(window,
 		&windowWidth, &windowHeight);
 
-	Minecraft::SetWindowSize(drawWidth, drawHeight, windowWidth, windowHeight);
+	Minecraft::SetViewportSize(drawWidth, drawHeight, windowWidth, windowHeight);
 	
 	// Internally, this multiplies by the GUI scale multiplier
 	if (g_pApp)
@@ -374,7 +374,7 @@ int main(int argc, char *argv[])
 
 	// Window Size
 #ifdef __EMSCRIPTEN__
-	Minecraft::SetWindowSize(std::stoi(argv[1]), std::stoi(argv[2]));
+	Minecraft::SetViewportSize(std::stoi(argv[1]), std::stoi(argv[2]));
 #endif
 
 	// Create Window

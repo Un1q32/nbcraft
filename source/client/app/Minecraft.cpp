@@ -49,10 +49,11 @@
 Minecraft* Minecraft::_singletonPtr;
 float Minecraft::_renderScaleMultiplier = 1.0f;
 
-unsigned int Minecraft::_physicalWidth  = C_DEFAULT_SCREEN_WIDTH;
-unsigned int Minecraft::_physicalHeight = C_DEFAULT_SCREEN_HEIGHT;
-unsigned int Minecraft::_logicalWidth   = C_DEFAULT_SCREEN_WIDTH;
-unsigned int Minecraft::_logicalHeight  = C_DEFAULT_SCREEN_HEIGHT;
+ViewportSize Minecraft::_viewportSize =
+    ViewportSize(
+        C_DEFAULT_SCREEN_WIDTH, C_DEFAULT_SCREEN_HEIGHT,
+        C_DEFAULT_SCREEN_WIDTH, C_DEFAULT_SCREEN_HEIGHT
+    );
 bool Minecraft::useAmbientOcclusion = true;
 int Minecraft::customDebugId = 0;
 InputMethod::Type Minecraft::_inputMethod = InputMethod::KEYBOARD;
@@ -1169,18 +1170,15 @@ void Minecraft::prepareLevel(const std::string& unused)
 
 void Minecraft::sizeUpdate()
 {
-	unsigned int physicalWidth  = GetWidthP();
-	unsigned int physicalHeight = GetHeightP();
-	unsigned int logicalWidth   = GetWidthL();
-	unsigned int logicalHeight  = GetHeightL();
+	const ViewportSize& size = GetViewportSize();
 
     // re-calculate the GUI scale.
-	Gui::GuiScale = 1.0f / getBestScaleForThisScreenSize(logicalWidth, logicalHeight);
+	Gui::GuiScale = 1.0f / getBestScaleForThisScreenSize(size.logical.width, size.logical.height);
 
 	// The ceil gives an extra pixel to the screen's width and height, in case the GUI scale doesn't
 	// divide evenly into width or height, so that none of the game screen is uncovered.
-	float newGuiWidth  = ceilf(logicalWidth  * Gui::GuiScale);
-	float newGuiHeight = ceilf(logicalHeight * Gui::GuiScale);
+	float newGuiWidth  = ceilf(size.logical.width  * Gui::GuiScale);
+	float newGuiHeight = ceilf(size.logical.height * Gui::GuiScale);
 	
 	// GuiSize did not change, bail out
 	if (newGuiWidth == Gui::GuiWidth && newGuiHeight == Gui::GuiHeight)
@@ -1201,7 +1199,7 @@ void Minecraft::sizeUpdate()
 	}
 
 	if (m_pInputHolder)
-		m_pInputHolder->setScreenSize(physicalWidth, physicalHeight);
+		m_pInputHolder->setScreenSize(size);
 }
 
 void Minecraft::setTextboxText(const std::string& text)
@@ -1555,9 +1553,9 @@ void Minecraft::locateMultiplayer()
 #endif
 }
 
-void Minecraft::SetWindowSize(unsigned int widthP, unsigned int heightP)
+void Minecraft::SetViewportSize(unsigned int widthP, unsigned int heightP)
 {
-	SetWindowSize(
+	SetViewportSize(
 		widthP,
 		heightP,
 		widthP  / GetRenderScaleMultiplier(),
@@ -1565,13 +1563,13 @@ void Minecraft::SetWindowSize(unsigned int widthP, unsigned int heightP)
 	);
 }
 
-void Minecraft::SetWindowSize(unsigned int widthP, unsigned int heightP, unsigned int widthL, unsigned int heightL)
+void Minecraft::SetViewportSize(unsigned int widthP, unsigned int heightP, unsigned int widthL, unsigned int heightL)
 {
-	Minecraft::_physicalWidth  = widthP;
-	Minecraft::_physicalHeight = heightP;
+	Minecraft::_viewportSize.physical.width  = widthP;
+	Minecraft::_viewportSize.physical.height = heightP;
 
-	Minecraft::_logicalWidth   = widthL;
-	Minecraft::_logicalHeight  = heightL;
+	Minecraft::_viewportSize.logical.width   = widthL;
+	Minecraft::_viewportSize.logical.height  = heightL;
 
 	// recalculate the point to pixel scale.
 	// This currently assumes that the aspect ratio is the same.

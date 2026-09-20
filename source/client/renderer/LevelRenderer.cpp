@@ -1288,7 +1288,7 @@ void LevelRenderer::renderCracks(const Entity& camera, const HitResult& hr, int 
 
 			Tesselator& t = Tesselator::instance;
 
-			t.begin(12);
+			t.begin(24);
 			t.setOffset(-p);
 			t.noColor();
 			if (!pTile)

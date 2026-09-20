@@ -15,6 +15,7 @@
 #include "client/gui/Gui.hpp"
 #include "client/gui/Screen.hpp"
 #include "client/gui/ScreenChooser.hpp"
+#include "client/gui/ViewportSize.hpp"
 #include "network/RakNetInstance.hpp"
 #include "network/NetEventCallback.hpp"
 #include "client/player/input/IInputHolder.hpp"
@@ -122,13 +123,13 @@ public:
 public:
 	static Minecraft& singleton() { return *_singletonPtr; }
 
-	// Gets the 
-	static unsigned int GetWidthP()   { return _physicalWidth; }
-	static unsigned int GetHeightP()  { return _physicalHeight; }
-	static unsigned int GetWidthL()   { return _logicalWidth; }
-	static unsigned int GetHeightL()  { return _logicalHeight; }
-	static void SetWindowSize(unsigned int physicalWidth, unsigned int physicalHeight);
-	static void SetWindowSize(unsigned int physicalWidth, unsigned int physicalHeight, unsigned int logicalWidth, unsigned int logicalHeight);
+	static unsigned int GetWidthP()   { return _viewportSize.physical.width; }
+	static unsigned int GetHeightP()  { return _viewportSize.physical.height; }
+	static unsigned int GetWidthL()   { return _viewportSize.logical.width; }
+	static unsigned int GetHeightL()  { return _viewportSize.logical.height; }
+    static const ViewportSize& GetViewportSize() { return _viewportSize; }
+	static void SetViewportSize(unsigned int physicalWidth, unsigned int physicalHeight);
+	static void SetViewportSize(unsigned int physicalWidth, unsigned int physicalHeight, unsigned int logicalWidth, unsigned int logicalHeight);
 
     static float GetRenderScaleMultiplier() { return _renderScaleMultiplier; }
     static void SetRenderScaleMultiplier(float value) { _renderScaleMultiplier = value; }
@@ -140,10 +141,7 @@ private:
 	static Minecraft* _singletonPtr;
 	// Value provided by the OS
 	static float _renderScaleMultiplier;
-	// the resolution the game is rendered at
-	static unsigned int _physicalWidth, _physicalHeight;
-	// the resolution the GUI is scaled at
-	static unsigned int _logicalWidth, _logicalHeight;
+	static ViewportSize _viewportSize;
 	static InputMethod::Type _inputMethod;
 
 public:

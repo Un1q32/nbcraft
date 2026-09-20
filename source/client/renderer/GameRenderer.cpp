@@ -982,12 +982,12 @@ void GameRenderer::pick(float f)
 		if (m_pMinecraft->m_pInputHolder->allowPicking())
 		{
 			int viewport[4] = { 0 };
-			viewport[2] = Minecraft::GetWidthP();
-			viewport[3] = Minecraft::GetHeightP();
+			viewport[2] = Minecraft::GetWidthL();
+			viewport[3] = Minecraft::GetHeightL();
 			float obj_coord[3] = { 0 };
 
 			if (glhUnProjectf(m_pMinecraft->m_pInputHolder->m_feedbackX,
-				              Minecraft::GetHeightP() - m_pMinecraft->m_pInputHolder->m_feedbackY,
+				              Minecraft::GetHeightL() - m_pMinecraft->m_pInputHolder->m_feedbackY,
 				              1.0f,
 				              m_mtxView.ptr(),
 				              m_mtxProj.ptr(),
@@ -997,7 +997,7 @@ void GameRenderer::pick(float f)
 				foundPosFar = mobPos + Vec3(obj_coord[0], obj_coord[1], obj_coord[2]);
 
 				glhUnProjectf(m_pMinecraft->m_pInputHolder->m_feedbackX,
-				              Minecraft::GetHeightP() - m_pMinecraft->m_pInputHolder->m_feedbackY,
+				              Minecraft::GetHeightL() - m_pMinecraft->m_pInputHolder->m_feedbackY,
 				              0.0f,
 				              m_mtxView.ptr(),
 				              m_mtxProj.ptr(),

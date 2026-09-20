@@ -233,7 +233,7 @@ static void handle_events()
 // Resizing
 static void resize()
 {
-    Minecraft::SetWindowSize(screen->w, screen->h);
+    Minecraft::SetViewportSize(screen->w, screen->h);
 
     if (g_pApp)
         g_pApp->sizeUpdate();
