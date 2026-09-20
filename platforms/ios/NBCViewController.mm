@@ -31,13 +31,6 @@ extern bool g_bIsMenuBackgroundAvailable;
 NSThread *G_drawFrameThread = nil;
 
 @interface NBCViewController () {
-    GLuint _program;
-    
-    float _rotation;
-    
-    GLuint _vertexArray;
-    GLuint _vertexBuffer;
-    
     Minecraft *_app;
     AppContext *_context;
     AppPlatform_iOS *_platform;
@@ -105,13 +98,13 @@ NSThread *G_drawFrameThread = nil;
 
 - (void)updateDrawSize
 {
+	Minecraft::SetRenderScaleMultiplier(self->viewScale);
     // NOTE: Swapping width & height because of device orientation
     // I guess when the device is sideways, the view doesn't rotate to be upright?
-    Minecraft::width = self.height; // drawWidth
-    Minecraft::height = self.width; // drawHeight
-	Minecraft::SetRenderScaleMultiplier(self->viewScale);
-    self->_app->sizeUpdate(Minecraft::width, Minecraft::height);
-    NSLog(@"Updated draw size to %d, %d\n", Minecraft::width, Minecraft::height);
+    Minecraft::SetWindowSize(self.height, self.width);
+	
+    self->_app->sizeUpdate(Minecraft::GetWidthP(), Minecraft::GetHeightP());
+    NSLog(@"Updated draw size to %d, %d\n", Minecraft::GetWidthP(), Minecraft::GetHeightP());
 }
 
 - (void)awakeFromNib

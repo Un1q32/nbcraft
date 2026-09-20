@@ -49,8 +49,10 @@
 Minecraft* Minecraft::_singletonPtr;
 float Minecraft::_renderScaleMultiplier = 1.0f;
 
-int Minecraft::width  = C_DEFAULT_SCREEN_WIDTH;
-int Minecraft::height = C_DEFAULT_SCREEN_HEIGHT;
+unsigned int Minecraft::_physicalWidth  = C_DEFAULT_SCREEN_WIDTH;
+unsigned int Minecraft::_physicalHeight = C_DEFAULT_SCREEN_HEIGHT;
+unsigned int Minecraft::_logicalWidth   = C_DEFAULT_SCREEN_WIDTH;
+unsigned int Minecraft::_logicalHeight  = C_DEFAULT_SCREEN_HEIGHT;
 bool Minecraft::useAmbientOcclusion = true;
 int Minecraft::customDebugId = 0;
 InputMethod::Type Minecraft::_inputMethod = InputMethod::KEYBOARD;
@@ -345,7 +347,7 @@ void Minecraft::setScreen(Screen* pScreen)
 		pScreen->init(this, Gui::GuiWidth, Gui::GuiHeight);
 	}
 
-	sizeUpdate(Minecraft::width, Minecraft::height);
+	sizeUpdate();
 
 	if (pScreen)
 	{
@@ -794,7 +796,7 @@ void Minecraft::handleTextPaste()
 void Minecraft::handlePointerLocation(MenuPointer::Unit x, MenuPointer::Unit y)
 {
 	if (m_pScreen)
-		m_pScreen->handlePointerLocation(x, y);
+		m_pScreen->handleRawPointerLocation(x, y);
 }
 
 void Minecraft::handlePointerPressedButtonPress()
@@ -924,7 +926,6 @@ void Minecraft::unloadLevel(bool bCopyMap)
 
 	m_pCameraEntity = m_pLocalPlayer = nullptr;
 
-
 	m_bUsingScreen = true;
 
 	if (bCopyMap)
@@ -947,7 +948,7 @@ void Minecraft::tick()
 	if (m_bPendingResize)
 	{
 		m_bPendingResize = false;
-		sizeUpdate(width, height);
+		sizeUpdate();
 	}
 
 	if (!m_pScreen)
@@ -1166,20 +1167,20 @@ void Minecraft::prepareLevel(const std::string& unused)
 	// " - prepr: ";
 }
 
-void Minecraft::sizeUpdate(int newWidth, int newHeight)
+void Minecraft::sizeUpdate()
 {
-    float renderScale = GetRenderScaleMultiplier();
-    
-	float windowWidth = newWidth / renderScale;
-	float windowHeight = newHeight / renderScale;
+	unsigned int physicalWidth  = GetWidthP();
+	unsigned int physicalHeight = GetHeightP();
+	unsigned int logicalWidth   = GetWidthL();
+	unsigned int logicalHeight  = GetHeightL();
 
     // re-calculate the GUI scale.
-	Gui::GuiScale = 1.0f / getBestScaleForThisScreenSize(windowWidth, windowHeight);
+	Gui::GuiScale = 1.0f / getBestScaleForThisScreenSize(logicalWidth, logicalHeight);
 
 	// The ceil gives an extra pixel to the screen's width and height, in case the GUI scale doesn't
 	// divide evenly into width or height, so that none of the game screen is uncovered.
-	float newGuiWidth  = ceilf(windowWidth  * Gui::GuiScale);
-	float newGuiHeight = ceilf(windowHeight * Gui::GuiScale);
+	float newGuiWidth  = ceilf(logicalWidth  * Gui::GuiScale);
+	float newGuiHeight = ceilf(logicalHeight * Gui::GuiScale);
 	
 	// GuiSize did not change, bail out
 	if (newGuiWidth == Gui::GuiWidth && newGuiHeight == Gui::GuiHeight)
@@ -1200,7 +1201,7 @@ void Minecraft::sizeUpdate(int newWidth, int newHeight)
 	}
 
 	if (m_pInputHolder)
-		m_pInputHolder->setScreenSize(newWidth, newHeight);
+		m_pInputHolder->setScreenSize(physicalWidth, physicalHeight);
 }
 
 void Minecraft::setTextboxText(const std::string& text)
@@ -1209,7 +1210,7 @@ void Minecraft::setTextboxText(const std::string& text)
 		m_pScreen->setTextboxText(text);
 }
 
-float Minecraft::getBestScaleForThisScreenSize(int width, int height)
+float Minecraft::getBestScaleForThisScreenSize(unsigned int width, unsigned int height)
 {
 	if (m_pScreen)
 	{
@@ -1552,4 +1553,23 @@ void Minecraft::locateMultiplayer()
 	m_pRakNetInstance->pingForHosts(C_DEFAULT_PORT);
 	m_pNetEventCallback = new ClientSideNetworkHandler(this, m_pRakNetInstance);
 #endif
+}
+
+void Minecraft::SetWindowSize(unsigned int widthP, unsigned int heightP)
+{
+	SetWindowSize(
+		widthP,
+		heightP,
+		widthP  / GetRenderScaleMultiplier(),
+		heightP / GetRenderScaleMultiplier()
+	);
+}
+
+void Minecraft::SetWindowSize(unsigned int widthP, unsigned int heightP, unsigned int widthL, unsigned int heightL)
+{
+	Minecraft::_physicalWidth  = widthP;
+	Minecraft::_physicalHeight = heightP;
+
+	Minecraft::_logicalWidth   = widthL;
+	Minecraft::_logicalHeight  = heightL;
 }

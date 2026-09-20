@@ -72,15 +72,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 			UINT width = Mth::Max<UINT>(LOWORD(lParam), 1);
 			UINT height = Mth::Max<UINT>(HIWORD(lParam), 1);
 
-			Minecraft::width  = width;
-			Minecraft::height = height;
-			Minecraft::SetRenderScaleMultiplier(1.0f); // assume no meddling with the DPI stuff
+			Minecraft::SetWindowSize(width, height);
 
 			g_AppPlatform.setScreenSize(width, height);
 
 			if (g_pApp)
 			{
-				g_pApp->sizeUpdate(width, height);
+				g_pApp->sizeUpdate();
 #if MCE_GFX_API_D3D9
 				g_pApp->onGraphicsReset();
 #endif
@@ -148,7 +146,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		return 1;
 	g_AppPlatform.initializeWindow(hWnd, nCmdShow);
 
-	if (!g_AppPlatform.initGraphics(Minecraft::width, Minecraft::height))
+	if (!g_AppPlatform.initGraphics(Minecraft::GetWidthP(), Minecraft::GetHeightP()))
 		goto _cleanup;
 
 	g_AppPlatform.setVSyncEnabled(true);
@@ -180,7 +178,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 
 	// initialize the app
 	g_pApp->init();
-	g_pApp->sizeUpdate(Minecraft::width, Minecraft::height);
+	g_pApp->sizeUpdate();
     g_pApp->start();
 
 	while (!g_pApp->wantToQuit())

@@ -49,7 +49,7 @@ TouchscreenInput_TestFps::TouchscreenInput_TestFps(Minecraft* pMinecraft, Option
 	for (int i = 0; i < 10; i++)
 		field_6C[i] = 0;
 
-	setScreenSize(Minecraft::width, Minecraft::height);
+	setScreenSize(Minecraft::GetWidthP(), Minecraft::GetHeightP());
 }
 
 void TouchscreenInput_TestFps::releaseAllKeys()

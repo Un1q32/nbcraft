@@ -807,7 +807,7 @@ void AOOption::apply()
 
 void GuiScaleOption::apply()
 {
-	m_pMinecraft->sizeUpdate(Minecraft::width, Minecraft::height);
+	m_pMinecraft->sizeUpdate();
 }
 
 void GammaOption::apply()
@@ -881,14 +881,14 @@ void SwapJumpSneakOption::apply()
 {
 	if (!m_pMinecraft || !m_pMinecraft->m_pInputHolder)
 		return;
-	m_pMinecraft->m_pInputHolder->setScreenSize(Minecraft::width, Minecraft::height);
+	m_pMinecraft->m_pInputHolder->setScreenSize(Minecraft::GetWidthP(), Minecraft::GetHeightP());
 }
 
 void DpadSizeOption::apply()
 {
 	if (!m_pMinecraft || !m_pMinecraft->m_pInputHolder)
 		return;
-	m_pMinecraft->m_pInputHolder->setScreenSize(Minecraft::width, Minecraft::height);
+	m_pMinecraft->m_pInputHolder->setScreenSize(Minecraft::GetWidthP(), Minecraft::GetHeightP());
 }
 
 std::string HUDSizeOption::getDisplayValue() const

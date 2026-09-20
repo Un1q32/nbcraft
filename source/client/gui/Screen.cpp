@@ -756,7 +756,7 @@ void Screen::mouseEvent()
 	MouseAction* pAction = Mouse::getEvent();
 	if (pAction->isButton())
 	{
-		handlePointerLocation(m_width * pAction->_posX / Minecraft::width, m_height * pAction->_posY / Minecraft::height - 1 + getYOffset());
+		handleRawPointerLocation(pAction->_posX, pAction->_posY);
 		handlePointerPressed(Mouse::getEventButtonState());
 
 		checkForPointerEvent(Mouse::getEventButton());
@@ -817,6 +817,14 @@ bool Screen::handleBackEvent(bool b)
 	return false;
 }
 
+void Screen::handleRawPointerLocation(unsigned int x, unsigned int y)
+{
+	x = m_width  * x / Minecraft::GetWidthP();
+	y = m_height * y / Minecraft::GetHeightP() - 1 + getYOffset();
+
+	handlePointerLocation(x, y);
+}
+
 void Screen::handlePointerLocation(MenuPointer::Unit x, MenuPointer::Unit y)
 {
 	m_menuPointer.x = Mth::clamp(x, 0.0f, float(m_width));
@@ -832,12 +840,12 @@ void Screen::handlePointerAction(const MenuPointer& pointer, MouseButtonType but
 {
 	if (pointer.isPressed)
 	{
-		// pointerPressed(m_width * pAction->_posX / Minecraft::width, m_height * pAction->_posY / Minecraft::height - 1 + getYOffset(), Mouse::getEventButton());
+		// pointerPressed(m_width * pAction->_posX / Minecraft::GetWidthL(), m_height * pAction->_posY / Minecraft::GetHeightL() - 1 + getYOffset(), Mouse::getEventButton());
 		pointerPressed(MenuPointer(pointer.x, pointer.y + getYOffset()), button);
 	}
 	else
 	{
-		// pointerReleased(m_width * pAction->_posX / Minecraft::width, m_height * pAction->_posY / Minecraft::height - 1 + getYOffset(), Mouse::getEventButton());
+		// pointerReleased(m_width * pAction->_posX / Minecraft::GetWidthL(), m_height * pAction->_posY / Minecraft::GetHeightL() - 1 + getYOffset(), Mouse::getEventButton());
 		pointerReleased(MenuPointer(pointer.x, pointer.y + getYOffset()), button);
 	}
 }

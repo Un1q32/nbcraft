@@ -306,7 +306,7 @@ void LogoRenderer::render3d(float f)
 		titleHeight *= 2;
 
 	MatrixStack::Ref projMtx = MatrixStack::Projection.pushIdentity();
-	projMtx->setPerspective(70.0f, float(Minecraft::width) / titleHeight, 0.05f, 100.0f);
+	projMtx->setPerspective(70.0f, float(Minecraft::GetWidthP()) / titleHeight, 0.05f, 100.0f);
 
 	int yOffset = 0;
 	if (isPocket)
@@ -318,10 +318,10 @@ void LogoRenderer::render3d(float f)
 	mce::ViewportOrigin viewportOrigin;
 	{
 		viewportOrigin.leftX = 0;
-		viewportOrigin.bottomLeftY = Minecraft::height - titleHeight + yOffset;
+		viewportOrigin.bottomLeftY = Minecraft::GetHeightP() - titleHeight + yOffset;
 		viewportOrigin.topLeftY = -yOffset;
 	}
-	renderContext.setViewport(Minecraft::width, titleHeight, 0.0f, 0.7f, viewportOrigin);
+	renderContext.setViewport(Minecraft::GetWidthP(), titleHeight, 0.0f, 0.7f, viewportOrigin);
 
 	MatrixStack::Ref viewMtx = MatrixStack::View.pushIdentity();
 
@@ -412,7 +412,7 @@ void LogoRenderer::render3d(float f)
 		}
 	}
 
-	renderContext.setViewport(Minecraft::width, Minecraft::height, 0.0f, 0.7f);
+	renderContext.setViewport(Minecraft::GetWidthP(), Minecraft::GetHeightP(), 0.0f, 0.7f);
 }
 
 Tile* TitleTile::_tiles[3];

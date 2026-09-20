@@ -95,13 +95,13 @@ public:
 
 	void update() override;
 	void init() override;
-	void sizeUpdate(int newWidth, int newHeight) override;
+	void sizeUpdate() override;
 	void setTextboxText(const std::string& text) override;
 
 	virtual void reloadFancy(bool isFancy);
 	virtual int getFpsIntlCounter();
 
-	float getBestScaleForThisScreenSize(int width, int height);
+	float getBestScaleForThisScreenSize(unsigned int width, unsigned int height);
 	void setupLevelRendering(Level* pLevel, Dimension* pDimension, Mob* pCamera);
 	void onClientStartedLevel(Level* pLevel, LocalPlayer* pLocalPlayer);
 	void generateLevel(const std::string& unused, Level& level);
@@ -119,21 +119,34 @@ public:
 	UITheme getUiTheme();
 	//const Entity& getCameraEntity() const { return *m_pCameraEntity; }
 
-private:
-	static Minecraft* _singletonPtr;
-    // Value provided by the OS
-    static float _renderScaleMultiplier;
-	static InputMethod::Type _inputMethod;
-
 public:
 	static Minecraft& singleton() { return *_singletonPtr; }
+
+	// Gets the 
+	static unsigned int GetWidthP()   { return _physicalWidth; }
+	static unsigned int GetHeightP()  { return _physicalHeight; }
+	static unsigned int GetWidthL()   { return _logicalWidth; }
+	static unsigned int GetHeightL()  { return _logicalHeight; }
+	static void SetWindowSize(unsigned int physicalWidth, unsigned int physicalHeight);
+	static void SetWindowSize(unsigned int physicalWidth, unsigned int physicalHeight, unsigned int logicalWidth, unsigned int logicalHeight);
+
     static float GetRenderScaleMultiplier() { return _renderScaleMultiplier; }
     static void SetRenderScaleMultiplier(float value) { _renderScaleMultiplier = value; }
+
 	static InputMethod::Type GetInputMethod() { return _inputMethod; }
 	static void SetInputMethod(InputMethod::Type inputType) { _inputMethod = inputType; }
     
+private:
+	static Minecraft* _singletonPtr;
+	// Value provided by the OS
+	static float _renderScaleMultiplier;
+	// the resolution the game is rendered at
+	static unsigned int _physicalWidth, _physicalHeight;
+	// the resolution the GUI is scaled at
+	static unsigned int _logicalWidth, _logicalHeight;
+	static InputMethod::Type _inputMethod;
+
 public:
-	static int width, height;
 	static bool useAmbientOcclusion;
 	static const char* progressMessages[];
 	static const bool DEADMAU5_CAMERA_CHEATS;

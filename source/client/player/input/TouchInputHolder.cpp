@@ -13,7 +13,7 @@
 
 TouchInputHolder::TouchInputHolder(Minecraft* pMinecraft, Options* pOptions) :
 	m_touchScreenInput(pMinecraft, pOptions),
-	m_unifiedTurnBuild(2, Minecraft::width, Minecraft::height, 200.0f, 1.05f, this),
+	m_unifiedTurnBuild(2, Minecraft::GetWidthP(), Minecraft::GetHeightP(), 200.0f, 1.05f, this),
 	m_pMinecraft(pMinecraft)
 {
 }

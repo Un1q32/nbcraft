@@ -25,7 +25,7 @@ public:
 	virtual void init();
     virtual void start();
 	virtual void update();
-	virtual void sizeUpdate(int newWidth, int newHeight);
+	virtual void sizeUpdate();
 	virtual void setTextboxText(const std::string& text);
 
 	void destroy();
