@@ -72,7 +72,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 			UINT width = Mth::Max<UINT>(LOWORD(lParam), 1);
 			UINT height = Mth::Max<UINT>(HIWORD(lParam), 1);
 
-			Minecraft::SetWindowSize(width, height);
+			Minecraft::SetViewportSize(width, height);
 
 			g_AppPlatform.setScreenSize(width, height);
 

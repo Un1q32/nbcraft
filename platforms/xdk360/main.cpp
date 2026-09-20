@@ -12,7 +12,7 @@ void _setSize()
 {
     XVIDEO_MODE VideoMode;
     XGetVideoMode(&VideoMode);
-    Minecraft::SetWindowSize(Mth::Max<int>(VideoMode.dwDisplayWidth, 640), Mth::Max<int>(VideoMode.dwDisplayHeight, 480);
+    Minecraft::SetViewportSize(Mth::Max<int>(VideoMode.dwDisplayWidth, 640), Mth::Max<int>(VideoMode.dwDisplayHeight, 480);
 
 	// Hardcoded 1080p check to avoid failed D3D device creation attempt
 	if (Minecraft::GetWidthP() == 1920 && Minecraft::GetHeightP() == 1080)
