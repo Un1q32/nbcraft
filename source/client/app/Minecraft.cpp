@@ -1171,7 +1171,7 @@ void Minecraft::sizeUpdate(int newWidth, int newHeight)
     float renderScale = GetRenderScaleMultiplier();
     
     // re-calculate the GUI scale.
-	Gui::GuiScale = 1.0f / getBestScaleForThisScreenSize(newWidth * renderScale, newHeight * renderScale);
+	Gui::GuiScale = 1.0f / getBestScaleForThisScreenSize(newWidth / renderScale, newHeight / renderScale);
 
 	// The ceil gives an extra pixel to the screen's width and height, in case the GUI scale doesn't
 	// divide evenly into width or height, so that none of the game screen is uncovered.
