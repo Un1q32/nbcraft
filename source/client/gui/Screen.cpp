@@ -819,8 +819,8 @@ bool Screen::handleBackEvent(bool b)
 
 void Screen::handleRawPointerLocation(unsigned int x, unsigned int y)
 {
-	x = m_width  * x / Minecraft::GetWidthP();
-	y = m_height * y / Minecraft::GetHeightP() - 1 + getYOffset();
+	x = m_width  * x / Minecraft::GetWidthL();
+	y = m_height * y / Minecraft::GetHeightL() - 1 + getYOffset();
 
 	handlePointerLocation(x, y);
 }
