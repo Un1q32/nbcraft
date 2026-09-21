@@ -126,9 +126,9 @@ void AppPlatform_iOS::hideKeyboard(LocalPlayerID playerId)
 
 unsigned int AppPlatform_iOS::getKeyboardUpOffset() const
 {
-    if (!m_bIsKeyboardShown)
-        return 0;
-    
+	if (!m_bIsKeyboardShown)
+		return 0;
+	
 	return m_pViewController.height / 2;
 }
 
