@@ -428,10 +428,12 @@ int main(int argc, char *argv[])
 	appPlatform->m_externalStorageDir = storagePath;
 	appPlatform->setVSyncEnabled(true);
 	g_pApp = new NinecraftApp;
-	g_pApp->start();
+	g_pApp->init();
 	
 	// Set Size
 	resize();
+
+	g_pApp->start();
 
 	// Loop
 #ifndef __EMSCRIPTEN__

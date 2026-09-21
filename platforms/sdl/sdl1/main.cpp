@@ -313,9 +313,13 @@ int main(int argc, char* argv[])
     appPlatform->m_externalStorageDir = storagePath;
     //LOG_I("Initializing NinecraftApp...");
     g_pApp = new NinecraftApp;
+    g_pApp->init();
+
+    // Set Size
+    resize();
+
     g_pApp->start();
 
-    resize();
     // We're off to the races
     while (true)
     {
