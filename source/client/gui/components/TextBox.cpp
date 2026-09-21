@@ -43,6 +43,20 @@ TextBox::~TextBox()
 	AppPlatform::singleton()->hideKeyboard(0);
 }
 
+void TextBox::_selectMe()
+{
+	m_pParent->selectElementById(getId());
+}
+
+void TextBox::_deselectMe()
+{
+	if (m_pParent->m_pSelectedElement == this)
+	{
+		// Deselect us
+		m_pParent->selectElement(nullptr);
+	}
+}
+
 void TextBox::_onSelectedChanged()
 {
 	if (isSelected())
@@ -93,10 +107,14 @@ bool TextBox::pointerPressed(Minecraft* pMinecraft, const MenuPointer& pointer)
 	bool result = _isHovered(pointer);
 	if (result)
 	{
-		m_pParent->selectElementById(getId());
+		_selectMe();
+		setFocused(true);
 	}
-    // Apply focus *after* we've deselected the previous element and selected ourselves
-	setFocused(result);
+	else
+	{
+		_deselectMe();
+	}
+
 	return result;
 }
 
@@ -271,7 +289,7 @@ void TextBox::handleUserAction(Minecraft* pMinecraft, const ActionInfo& action)
 		case AKEYCODE_ENTER:
 		{
 			// Enter
-			setFocused(false);
+			_deselectMe();
 			break;
 		}
 	}
