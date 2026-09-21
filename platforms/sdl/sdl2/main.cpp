@@ -162,7 +162,7 @@ static void handle_touch(int x, int y, int type, char id) {
 #ifdef __EMSCRIPTEN__
 extern "C" void resize_from_js(int new_width, int new_height)
 {
-	SDL_SetViewportSize(window, new_width, new_height);
+	SDL_SetWindowSize(window, new_width, new_height);
 }
 #endif
 
