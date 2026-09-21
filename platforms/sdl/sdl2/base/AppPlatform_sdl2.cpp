@@ -97,6 +97,8 @@ int AppPlatform_sdl2::getScreenWidth() const
 	/*int width;
 	SDL_GL_GetDrawableSize(m_pWindow, &width, nullptr);
 	return width;*/
+
+	return 0;
 }
 
 int AppPlatform_sdl2::getScreenHeight() const
@@ -104,6 +106,8 @@ int AppPlatform_sdl2::getScreenHeight() const
 	/*int height;
 	SDL_GL_GetDrawableSize(m_pWindow, nullptr, &height);
 	return height;*/
+
+	return 0;
 }
 
 void AppPlatform_sdl2::showKeyboard(LocalPlayerID playerId, const VirtualKeyboard& keyboard)
