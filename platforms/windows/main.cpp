@@ -54,6 +54,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 			{
 				posX = GET_X_LPARAM(lParam);
 				posY = GET_Y_LPARAM(lParam);
+
+				if (Minecraft::GetRenderScaleMultiplier() != 1.0f)
+				{
+					// convert from physical to logical size
+					posX /= Minecraft::GetRenderScaleMultiplier();
+					posY /= Minecraft::GetRenderScaleMultiplier();
+				}
 			}
 			else
 			{

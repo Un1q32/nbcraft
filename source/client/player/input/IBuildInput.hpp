@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BuildActionIntention.hpp"
-#include "ViewportSize.hpp"
+#include "client/gui/ViewportSize.hpp"
 
 class Player;
 
