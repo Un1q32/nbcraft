@@ -415,25 +415,6 @@ void Screen::pointerPressed(const MenuPointer& pointer, MouseButtonType btn)
 			}
 		}
 	}
-
-#ifndef ORIGINAL_CODE
-	// @TODO: old code? why is this only doing this for Android? how does this work on iOS?
-#ifdef USE_NATIVE_ANDROID
-	// if the keyboard is shown:
-	if (AppPlatform::singleton()->getKeyboardUpOffset())
-	{
-		// if there are none focused at the moment:
-		bool areAnyFocused = false;
-		
-		GuiElement* element = _getSelectedElement();
-		if (element && element->getType() == GuiElement::TYPE_TEXTBOX)
-			areAnyFocused = true;
-
-		if (!areAnyFocused)
-			AppPlatform::singleton()->hideKeyboard(0);
-	}
-#endif
-#endif
 }
 
 void Screen::pointerReleased(const MenuPointer& pointer, MouseButtonType btn)

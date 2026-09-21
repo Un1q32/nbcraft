@@ -60,6 +60,9 @@ void TextBox::_onSelectedChanged()
 
 void TextBox::_onFocusChanged()
 {
+    Minecraft& mc = *m_pParent->m_pMinecraft;
+    VirtualKeyboardManager& virtualKeyboardManager = mc.m_virtualKeyboardManager;
+    
 	if (hasFocus())
 	{
 		VirtualKeyboard keyboard;
@@ -72,15 +75,12 @@ void TextBox::_onFocusChanged()
 
 		keyboard.defaultText = m_text;
 
-		AppPlatform::singleton()->showKeyboard(0, keyboard);
+        virtualKeyboardManager.showKeyboard(0, keyboard);
 	}
 	else
 	{
-		AppPlatform::singleton()->hideKeyboard(0);
+		virtualKeyboardManager.hideKeyboard(0);
 	}
-
-	// don't actually hide the keyboard when unfocusing
-	// - we may be undoing the work of another text box
 }
 
 void TextBox::init(Font* pFont)
@@ -91,12 +91,12 @@ void TextBox::init(Font* pFont)
 bool TextBox::pointerPressed(Minecraft* pMinecraft, const MenuPointer& pointer)
 {
 	bool result = _isHovered(pointer);
-	setFocused(result);
 	if (result)
 	{
-		// scuffed as hell
-		pMinecraft->m_pScreen->selectElementById(getId());
+		m_pParent->selectElementById(getId());
 	}
+    // Apply focus *after* we've deselected the previous element and selected ourselves
+	setFocused(result);
 	return result;
 }
 

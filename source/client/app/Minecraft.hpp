@@ -9,6 +9,7 @@
 #pragma once
 
 #include "App.hpp"
+#include "VirtualKeyboardManager.hpp"
 #include "common/threading/CThread.hpp"
 #include "common/Mth.hpp"
 #include "common/Timer.hpp"
@@ -181,6 +182,7 @@ public:
 	int field_D18;
 	IInputHolder* m_pInputHolder;
 	MouseHandler m_mouseHandler;
+    VirtualKeyboardManager m_virtualKeyboardManager;
 	bool m_bGrabbedMouse;
 	bool m_bIsTouchscreen;
 	HitResult m_hitResult;

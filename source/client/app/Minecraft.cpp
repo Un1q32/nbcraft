@@ -587,6 +587,8 @@ void Minecraft::tickInput()
 
 	if (m_pScreen)
 	{
+        m_virtualKeyboardManager.tick();
+        
 		if (!m_pScreen->m_bPassEvents)
 		{
 			m_bUsingScreen = true;
