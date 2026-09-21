@@ -336,20 +336,24 @@ static void initWindow(struct engine* engine, struct android_app* app)
     g_AppPlatform.setScreenSize(w, h);
     g_AppPlatform.initAndroidApp(app);
 
-    Minecraft::SetWindowSize(w, h);
-
     if (!engine->initted)
     {
         g_AppPlatform.m_externalStorageDir = getExternalStorageDir(engine);
         g_AppPlatform.setExternalStoragePath(g_AppPlatform.m_externalStorageDir);
+		
+        engine->ninecraftApp->init();
+		
+        Minecraft::SetViewportSize(w, h);
+        engine->ninecraftApp->sizeUpdate();
+		
         engine->ninecraftApp->start();
     }
     else
     {
         engine->ninecraftApp->onGraphicsReset();
+        Minecraft::SetViewportSize(w, h);
+        engine->ninecraftApp->sizeUpdate();
     }
-
-    engine->ninecraftApp->sizeUpdate();
 
     engine->initted = true;
 
