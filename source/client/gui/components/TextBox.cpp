@@ -331,7 +331,7 @@ void TextBox::handleTextChar(Minecraft* pMinecraft, int k)
 	switch (k)
 	{
 		case '\b': // BACKSPACE
-		case '\0x7F': // DELETE
+		case '\x7F': // DELETE
 		{
 			// Backspace
 			if (m_text.empty())
@@ -353,7 +353,7 @@ void TextBox::handleTextChar(Minecraft* pMinecraft, int k)
 		}
 		/* There's not much of a point in handling deletes differently,
 		 * especially since old Mac OS versions send delete instead of backspace.
-		case '\0x7F': // DELETE
+		case '\x7F': // DELETE
 		{
 			// Delete
 			if (m_text.empty())
@@ -371,7 +371,7 @@ void TextBox::handleTextChar(Minecraft* pMinecraft, int k)
 			m_text.erase(m_text.begin() + m_insertHead, m_text.begin() + m_insertHead + 1);
 			break;
 		}*/
-		case 0x0D: // carriage return
+		case '\x0D': // carriage return
 		{
 			// Enter
 			_deselectMe();
