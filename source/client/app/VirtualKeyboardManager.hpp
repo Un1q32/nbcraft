@@ -32,6 +32,7 @@ public:
     
 	void showKeyboard(LocalPlayerID playerId, const VirtualKeyboard& keyboard);
 	void hideKeyboard(LocalPlayerID playerId);
+    bool isKeyboardVisible() const { return m_queuedState.bVisible; }
     
 private:
     bool m_bHasQueuedState;

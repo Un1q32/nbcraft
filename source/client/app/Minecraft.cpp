@@ -332,7 +332,7 @@ void Minecraft::setScreen(Screen* pScreen)
 	if (m_pScreen)
 	{
 		m_pScreen->removed();
-		if (pScreen && pScreen->m_bDeletePrevious)
+		if (!pScreen || (pScreen && pScreen->m_bDeletePrevious))
 			delete m_pScreen;
 	}
 
@@ -584,11 +584,11 @@ void Minecraft::tickInput()
 
 	if (!m_pInputHolder->allowsInputMethod(GetInputMethod()))
 		reloadInput();
-
+    
+    m_virtualKeyboardManager.tick();
+    
 	if (m_pScreen)
 	{
-        m_virtualKeyboardManager.tick();
-        
 		if (!m_pScreen->m_bPassEvents)
 		{
 			m_bUsingScreen = true;

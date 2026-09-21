@@ -44,6 +44,9 @@ void VirtualKeyboardManager::_applyState()
 
 void VirtualKeyboardManager::tick()
 {
+    if (!AppPlatform::singleton()->hasVirtualKeyboard())
+        return;
+    
     if (m_bHasQueuedState)
         _applyState();
 }

@@ -563,9 +563,8 @@ bool Screen::prevTab()
 
 int Screen::getYOffset()
 {
-#ifdef USE_NATIVE_ANDROID
 	int keybOffset = AppPlatform::singleton()->getKeyboardUpOffset();
-	if (!keybOffset)
+	if (keybOffset == 0)
 		return 0;
 
 	int offset = 0;
@@ -573,27 +572,21 @@ int Screen::getYOffset()
 	GuiElement* element = _getSelectedElement();
 	if (element && element->getType() == GuiElement::TYPE_TEXTBOX)
 	{
-		int heightLeft = m_height - int(float(keybOffset) * Gui::GuiScale);
+		int heightLeft = m_height - int(float(keybOffset) / Minecraft::GetRenderScaleMultiplier() * Gui::GuiScale);
 
 		// we want to keep the center of the text box in the center of the screen
-		int textCenterY = element->m_yPos + element->m_height / 2;
+        // also, this math is stupid and could be improved, but it works, so idc
+		int textCenterY = ((element->m_yPos + element->m_height + 1) / 2) + (element->m_height / 2);
 		int scrnCenterY = heightLeft / 2;
-
-		int diff = textCenterY - scrnCenterY;
-
+        
 		// Prevent the difference from revealing the outside of the screen.
-		if (diff > m_height - heightLeft)
-			diff = m_height - heightLeft;
-		if (diff < 0)
-			diff = 0;
+		int diff = textCenterY - scrnCenterY;
+        diff = Mth::clamp(diff, 0, m_height - heightLeft);
 
 		offset = diff;
 	}
 
 	return offset;
-#else
-	return 0;
-#endif
 }
 
 bool Screen::doElementTabbing() const
@@ -801,7 +794,7 @@ bool Screen::handleBackEvent(bool b)
 void Screen::handleRawPointerLocation(unsigned int x, unsigned int y)
 {
 	x = m_width  * x / Minecraft::GetWidthL();
-	y = m_height * y / Minecraft::GetHeightL() - 1 + getYOffset();
+	y = m_height * y / Minecraft::GetHeightL();
 
 	handlePointerLocation(x, y);
 }
@@ -809,7 +802,7 @@ void Screen::handleRawPointerLocation(unsigned int x, unsigned int y)
 void Screen::handlePointerLocation(MenuPointer::Unit x, MenuPointer::Unit y)
 {
 	m_menuPointer.x = Mth::clamp(x, 0.0f, float(m_width));
-	m_menuPointer.y = Mth::clamp(y, 0.0f, float(m_height));
+	m_menuPointer.y = Mth::clamp(y, 0.0f, float(m_height)) - 1 + m_yOffset;
 }
 
 void Screen::handlePointerPressed(bool isPressed)
@@ -822,12 +815,12 @@ void Screen::handlePointerAction(const MenuPointer& pointer, MouseButtonType but
 	if (pointer.isPressed)
 	{
 		// pointerPressed(m_width * pAction->_posX / Minecraft::GetWidthL(), m_height * pAction->_posY / Minecraft::GetHeightL() - 1 + getYOffset(), Mouse::getEventButton());
-		pointerPressed(MenuPointer(pointer.x, pointer.y + getYOffset()), button);
+		pointerPressed(MenuPointer(pointer.x, pointer.y), button);
 	}
 	else
 	{
 		// pointerReleased(m_width * pAction->_posX / Minecraft::GetWidthL(), m_height * pAction->_posY / Minecraft::GetHeightL() - 1 + getYOffset(), Mouse::getEventButton());
-		pointerReleased(MenuPointer(pointer.x, pointer.y + getYOffset()), button);
+		pointerReleased(MenuPointer(pointer.x, pointer.y), button);
 	}
 }
 

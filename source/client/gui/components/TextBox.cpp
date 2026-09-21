@@ -40,7 +40,10 @@ TextBox::TextBox(Screen* parent, int x, int y, int width, int height, const std:
 
 TextBox::~TextBox()
 {
-	AppPlatform::singleton()->hideKeyboard(0);
+    Minecraft& mc = *m_pParent->m_pMinecraft;
+    VirtualKeyboardManager& virtualKeyboardManager = mc.m_virtualKeyboardManager;
+    
+    virtualKeyboardManager.hideKeyboard(0);
 }
 
 void TextBox::_selectMe()
@@ -104,6 +107,12 @@ void TextBox::init(Font* pFont)
 
 bool TextBox::pointerPressed(Minecraft* pMinecraft, const MenuPointer& pointer)
 {
+    if (pMinecraft->m_virtualKeyboardManager.isKeyboardVisible())
+    {
+        // we have a keyboard out, never unfocus until "Enter" is pressed
+        return false;
+    }
+    
 	bool result = _isHovered(pointer);
 	if (result)
 	{
@@ -322,7 +331,7 @@ void TextBox::handleTextChar(Minecraft* pMinecraft, int k)
 	switch (k)
 	{
 		case '\b': // BACKSPACE
-		case '\x7f': // DELETE
+		case '\0x7F': // DELETE
 		{
 			// Backspace
 			if (m_text.empty())
@@ -344,7 +353,7 @@ void TextBox::handleTextChar(Minecraft* pMinecraft, int k)
 		}
 		/* There's not much of a point in handling deletes differently,
 		 * especially since old Mac OS versions send delete instead of backspace.
-		case '\x7f': // DELETE
+		case '\0x7F': // DELETE
 		{
 			// Delete
 			if (m_text.empty())
@@ -362,6 +371,12 @@ void TextBox::handleTextChar(Minecraft* pMinecraft, int k)
 			m_text.erase(m_text.begin() + m_insertHead, m_text.begin() + m_insertHead + 1);
 			break;
 		}*/
+		case 0x0D: // carriage return
+		{
+			// Enter
+			_deselectMe();
+			break;
+		}
         default:
         {
             // Ignore Unprintable Characters
