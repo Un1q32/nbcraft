@@ -289,7 +289,24 @@ static void handle_events()
 					window_resized = true;
 				}
 				break;
-			}
+			case SDL_APP_TERMINATING:
+				getPlatform()->_fireAppTerminated();
+				break;
+			case SDL_APP_LOWMEMORY:
+				getPlatform()->_fireLowMemory();
+				break;
+			case SDL_APP_WILLENTERBACKGROUND:
+				getPlatform()->_fireAppFocusLost();
+				break;
+			case SDL_APP_DIDENTERBACKGROUND:
+				getPlatform()->_fireAppSuspended();
+				break;
+			case SDL_APP_WILLENTERFOREGROUND:
+				getPlatform()->_fireAppResumed();
+				break;
+			case SDL_APP_DIDENTERFOREGROUND:
+				getPlatform()->_fireAppFocusGained();
+				break;
 			case SDL_QUIT:
 			{
 				g_pApp->quit();
