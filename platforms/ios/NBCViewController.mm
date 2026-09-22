@@ -26,8 +26,6 @@
 #include "EAGLView.h"
 #include "ShowKeyboardView.h"
 
-extern bool g_bIsMenuBackgroundAvailable;
-
 NSThread *G_drawFrameThread = nil;
 
 @interface NBCViewController () {
