@@ -73,8 +73,8 @@ NSThread *G_drawFrameThread = nil;
         bounds.origin.x = 0, bounds.origin.y = 0;
         bounds.size.width = 0, bounds.size.height = 0;
     }
-    if (bounds.size.width > bounds.size.height)
-        bounds.size.height = bounds.size.width;
+    if (bounds.size.height > bounds.size.width)
+        bounds.size.width = bounds.size.height;
     return bounds.size.width * self->viewScale;
 }
 
@@ -91,7 +91,7 @@ NSThread *G_drawFrameThread = nil;
         bounds.origin.x = 0, bounds.origin.y = 0;
         bounds.size.width = 0, bounds.size.height = 0;
     }
-    if (bounds.size.width > bounds.size.height)
+    if (bounds.size.width < bounds.size.height)
         bounds.size.height = bounds.size.width;
     return bounds.size.height * self->viewScale;
 }
@@ -99,9 +99,7 @@ NSThread *G_drawFrameThread = nil;
 - (void)updateDrawSize
 {
 	Minecraft::SetRenderScaleMultiplier(self->viewScale);
-    // NOTE: Swapping width & height because of device orientation
-    // I guess when the device is sideways, the view doesn't rotate to be upright?
-    Minecraft::SetViewportSize(self.height, self.width);
+    Minecraft::SetViewportSize(self.width, self.height);
 	
     self->_app->sizeUpdate();
     NSLog(@"Updated draw size to %d, %d\n", Minecraft::GetWidthP(), Minecraft::GetHeightP());
