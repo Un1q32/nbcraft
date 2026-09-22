@@ -110,6 +110,11 @@ int AppPlatform_sdl2::getScreenHeight() const
 	return 0;
 }
 
+bool AppPlatform_sdl2::hasVirtualKeyboard() const
+{
+	return true;
+}
+
 void AppPlatform_sdl2::showKeyboard(LocalPlayerID playerId, const VirtualKeyboard& keyboard)
 {
 	if (SDL_IsTextInputActive())
