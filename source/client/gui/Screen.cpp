@@ -795,6 +795,7 @@ void Screen::handleRawPointerLocation(unsigned int x, unsigned int y)
 {
 	x = m_width  * x / Minecraft::GetWidthL();
 	y = m_height * y / Minecraft::GetHeightL();
+	y += m_yOffset;
 
 	handlePointerLocation(x, y);
 }
@@ -802,7 +803,7 @@ void Screen::handleRawPointerLocation(unsigned int x, unsigned int y)
 void Screen::handlePointerLocation(MenuPointer::Unit x, MenuPointer::Unit y)
 {
 	m_menuPointer.x = Mth::clamp(x, 0.0f, float(m_width));
-	m_menuPointer.y = Mth::clamp(y, 0.0f, float(m_height)) - 1 + m_yOffset;
+	m_menuPointer.y = Mth::clamp(y, 0.0f, float(m_height));
 }
 
 void Screen::handlePointerPressed(bool isPressed)
@@ -814,12 +815,10 @@ void Screen::handlePointerAction(const MenuPointer& pointer, MouseButtonType but
 {
 	if (pointer.isPressed)
 	{
-		// pointerPressed(m_width * pAction->_posX / Minecraft::GetWidthL(), m_height * pAction->_posY / Minecraft::GetHeightL() - 1 + getYOffset(), Mouse::getEventButton());
 		pointerPressed(MenuPointer(pointer.x, pointer.y), button);
 	}
 	else
 	{
-		// pointerReleased(m_width * pAction->_posX / Minecraft::GetWidthL(), m_height * pAction->_posY / Minecraft::GetHeightL() - 1 + getYOffset(), Mouse::getEventButton());
 		pointerReleased(MenuPointer(pointer.x, pointer.y), button);
 	}
 }
@@ -864,6 +863,8 @@ void Screen::handleControllerStickEvent(const GameController::StickEvent& stick,
 
 		// Multiply by delta for smooth movement
 		Vec2 move = targetVelocity * C_POINTER_FRICTION * deltaTime;
+
+		//move /= Minecraft::GetRenderScaleMultiplier();
 
 		handlePointerLocation(m_menuPointer.x + move.x, m_menuPointer.y - move.y);
 	}
