@@ -271,15 +271,15 @@ static std::string getExternalStorageDir(struct engine* engine)
 #endif
 }
 
-static void _getDisplayDPIs(float& xdpi, float& ydpi)
+static void _getDisplayDPIs(struct android_app* app, float& xdpi, float& ydpi)
 {
-    JavaVM* pVM = m_app->activity->vm;
-    JNIEnv* pEnv = m_app->activity->env;
+    JavaVM* pVM = app->activity->vm;
+    JNIEnv* pEnv = app->activity->env;
    
     pVM->AttachCurrentThread(&pJNIEnv, nullptr);
 
     // Retrieves NativeActivity.
-    jobject lNativeActivity = m_app->activity->clazz;
+    jobject lNativeActivity = app->activity->clazz;
     jclass ClassNativeActivity = pEnv->GetObjectClass(lNativeActivity);
 
     /*
@@ -384,7 +384,7 @@ static void initWindow(struct engine* engine, struct android_app* app)
     g_AppPlatform.initAndroidApp(app);
 	
     float xdpi, ydpi;
-    _getDisplayDPIs(xdpi, ydpi);
+    _getDisplayDPIs(app, xdpi, ydpi);
 
     unsigned int logicalWidth  = float(w * 160) / xdpi;
     unsigned int logicalHeight = float(h * 160) / ydpi;
