@@ -276,7 +276,7 @@ static void _getDisplayDPIs(struct android_app* app, float& xdpi, float& ydpi)
     JavaVM* pVM = app->activity->vm;
     JNIEnv* pEnv = app->activity->env;
    
-    pVM->AttachCurrentThread(&pJNIEnv, nullptr);
+    pVM->AttachCurrentThread(&pEnv, nullptr);
 
     // Retrieves NativeActivity.
     jobject lNativeActivity = app->activity->clazz;
