@@ -271,6 +271,53 @@ static std::string getExternalStorageDir(struct engine* engine)
 #endif
 }
 
+static void _getDisplayDPIs(float& xdpi, float& ydpi)
+{
+    JavaVM* pVM = m_app->activity->vm;
+    JNIEnv* pEnv = m_app->activity->env;
+   
+    pVM->AttachCurrentThread(&pJNIEnv, nullptr);
+
+    // Retrieves NativeActivity.
+    jobject lNativeActivity = m_app->activity->clazz;
+    jclass ClassNativeActivity = pEnv->GetObjectClass(lNativeActivity);
+
+    /*
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        this.getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        xdpi = displayMetrics.xdpi;
+        ydpi = displayMetrics.ydpi;
+    */
+    
+    // Runs getWindowManager()
+    jmethodID methodGetWindowManager = pEnv->GetMethodID(ClassNativeActivity, "getWindowManager", "()Landroid/view/WindowManager;");
+    jobject windowManager = pEnv->CallObjectMethod(lNativeActivity, methodGetWindowManager);
+
+    // Runs windowManager.getDefaultDisplay()
+    jclass classWindowManager = pEnv->GetObjectClass(windowManager);
+    jmethodID methodGetDefaultDisplay = pEnv->GetMethodID(classWindowManager, "getDefaultDisplay", "()Landroid/view/Display;");
+    jobject display = pEnv->CallObjectMethod(windowManager, methodGetDefaultDisplay);
+
+    // Creates a new DisplayMetrics
+    jclass classDisplayMetrics = pEnv->FindClass("android/util/DisplayMetrics");
+    jmethodID methodDisplayMetricsInit = pEnv->GetMethodID(classDisplayMetrics, "<init>", "()V");
+    jobject displayMetrics = pEnv->NewObject(classDisplayMetrics, methodDisplayMetricsInit);
+
+    // Runs display.getMetrics(displayMetrics)
+    jclass classDisplay = pEnv->GetObjectClass(display);
+    jmethodID methodGetMetrics = pEnv->GetMethodID(classDisplay, "getMetrics", "(Landroid/util/DisplayMetrics;)V");
+    pEnv->CallVoidMethod(display, methodGetMetrics, displayMetrics);
+
+    // Gets displayMetrics.xdpi and ydpi
+    jfieldID fieldXdpi = pEnv->GetFieldID(classDisplayMetrics, "xdpi", "F");
+    jfieldID fieldYdpi = pEnv->GetFieldID(classDisplayMetrics, "ydpi", "F");
+
+    xdpi = pEnv->GetFloatField(displayMetrics, fieldXdpi);
+    ydpi = pEnv->GetFloatField(displayMetrics, fieldYdpi);
+
+    pVM->DetachCurrentThread();
+}
+
 /**
 * Process the next main command.
 */
@@ -329,12 +376,18 @@ static void initWindow(struct engine* engine, struct android_app* app)
         return;
     }
 
-    eglQuerySurface(engine->display, engine->surface, EGL_WIDTH, &w);
+    eglQuerySurface(engine->display, engine->surface, EGL_WIDTH,  &w);
     eglQuerySurface(engine->display, engine->surface, EGL_HEIGHT, &h);
 
     g_AppPlatform.initConsts();
     g_AppPlatform.setScreenSize(w, h);
     g_AppPlatform.initAndroidApp(app);
+	
+    float xdpi, ydpi;
+    _getDisplayDPIs(xdpi, ydpi);
+
+    unsigned int logicalWidth  = float(w * 160) / xdpi;
+    unsigned int logicalHeight = float(h * 160) / ydpi;
 
     if (!engine->initted)
     {
@@ -343,7 +396,7 @@ static void initWindow(struct engine* engine, struct android_app* app)
 		
         engine->ninecraftApp->init();
 		
-        Minecraft::SetViewportSize(w, h);
+        Minecraft::SetViewportSize(w, h, logicalWidth, logicalHeight);
         engine->ninecraftApp->sizeUpdate();
 		
         engine->ninecraftApp->start();
@@ -351,7 +404,7 @@ static void initWindow(struct engine* engine, struct android_app* app)
     else
     {
         engine->ninecraftApp->onGraphicsReset();
-        Minecraft::SetViewportSize(w, h);
+        Minecraft::SetViewportSize(w, h, logicalWidth, logicalHeight);
         engine->ninecraftApp->sizeUpdate();
     }
 
