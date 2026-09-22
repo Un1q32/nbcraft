@@ -575,13 +575,12 @@ int Screen::getYOffset()
 		int heightLeft = m_height - int(float(keybOffset) / Minecraft::GetRenderScaleMultiplier() * Gui::GuiScale);
 
 		// we want to keep the center of the text box in the center of the screen
-        // also, this math is stupid and could be improved, but it works, so idc
-		int textCenterY = ((element->m_yPos + element->m_height + 1) / 2) + (element->m_height / 2);
+		int textCenterY = element->m_yPos + (element->m_height / 2);
 		int scrnCenterY = heightLeft / 2;
         
 		// Prevent the difference from revealing the outside of the screen.
 		int diff = textCenterY - scrnCenterY;
-        diff = Mth::clamp(diff, 0, m_height - heightLeft);
+        diff = Mth::clamp(diff, 0, m_height - heightLeft + 1); // +1 to fix the chat textbox cutoff
 
 		offset = diff;
 	}
@@ -863,8 +862,6 @@ void Screen::handleControllerStickEvent(const GameController::StickEvent& stick,
 
 		// Multiply by delta for smooth movement
 		Vec2 move = targetVelocity * C_POINTER_FRICTION * deltaTime;
-
-		//move /= Minecraft::GetRenderScaleMultiplier();
 
 		handlePointerLocation(m_menuPointer.x + move.x, m_menuPointer.y - move.y);
 	}
