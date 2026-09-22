@@ -431,7 +431,9 @@ static void engine_handle_cmd(struct android_app* app, int32_t cmd) {
 
     case APP_CMD_TERM_WINDOW:
         LOG_I("APP_CMD_TERM_WINDOW");
-        engine->ninecraftApp->saveOptions();
+        
+        g_AppPlatform._fireAppTerminated();
+        
         if (engine->display)
         {
             eglMakeCurrent(engine->display, 0, 0, 0);
@@ -445,10 +447,20 @@ static void engine_handle_cmd(struct android_app* app, int32_t cmd) {
         break;
     case APP_CMD_GAINED_FOCUS:
         engine->animating = 1;
+        g_AppPlatform._fireAppFocusGained();
         break;
     case APP_CMD_LOST_FOCUS:
         engine->animating = 0;
-        engine->ninecraftApp->saveOptions();
+        g_AppPlatform._fireAppFocusLost();
+        break;
+    case APP_CMD_LOW_MEMORY:
+        g_AppPlatform._fireLowMemory();
+        break;
+    case APP_CMD_PAUSE:
+        g_AppPlatform._fireAppSuspended();
+        break;
+    case APP_CMD_RESUME:
+        g_AppPlatform._fireAppResumed();
         break;
     }
 }
