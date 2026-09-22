@@ -289,6 +289,7 @@ static void handle_events()
 					window_resized = true;
 				}
 				break;
+			}
 			case SDL_APP_TERMINATING:
 				getPlatform()->_fireAppTerminated();
 				break;
